@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trainings- &amp; Korrekturplan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a2137;
+    --panel: #0e2c47;
+    --panel-alt: #0d2740;
+    --sidebar: #081c30;
+    --line: #3f6f8f;
+    --line-soft: rgba(63,111,143,0.35);
+    --cyan: #7fd1e8;
+    --cyan-dim: #4f93ac;
+    --paper: #eaf3f8;
+    --text: #e7f2f8;
+    --text-muted: #90b3c8;
+    --warn: #ff7a54;
+    --ok: #8fd0a0;
+    --radius: 3px;
+    --sidebar-w: 232px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--bg), var(--bg)),
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(127,209,232,0.05) 28px),
+      repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(127,209,232,0.05) 28px);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  .app{ display:flex; min-height:100vh; max-width:1280px; margin:0 auto; }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:var(--sidebar-w); flex:none;
+    background:var(--sidebar);
+    border-right:1px solid var(--line);
+    padding:22px 16px;
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .brand .proj-no{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em;
+    color:var(--cyan-dim); text-transform:uppercase;
+  }
+  .brand h1{
+    font-size:19px; font-weight:800; color:var(--paper); margin:5px 0 4px 0; letter-spacing:-0.01em; line-height:1.2;
+  }
+  .brand .meta{
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cyan-dim); line-height:1.8; margin-bottom:20px;
+  }
+  .navlist{ list-style:none; margin:0; padding:0; border-top:1px solid var(--line); padding-top:10px; }
+  .navlist li{ margin-bottom:2px; }
+  .navbtn{
+    display:flex; align-items:center; gap:10px; width:100%;
+    background:transparent; border:1px solid transparent; text-align:left; cursor:pointer;
+    color:var(--text-muted); font-family:'Inter',sans-serif; font-size:13px; font-weight:600;
+    padding:9px 10px; border-radius:var(--radius);
+  }
+  .navbtn .ico{
+    width:22px;height:22px;flex:none;border-radius:50%;border:1px solid var(--cyan-dim);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--cyan-dim);
+  }
+  .navbtn:hover{ color:var(--paper); background:rgba(127,209,232,0.06); }
+  .navbtn.active{ color:var(--paper); background:rgba(127,209,232,0.1); border-color:var(--line); }
+  .navbtn.active .ico{ background:var(--cyan); color:var(--sidebar); border-color:var(--cyan); }
+  .navhint{
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cyan-dim); opacity:0.7;
+    margin-top:24px; padding-top:14px; border-top:1px solid var(--line); line-height:1.7;
+  }
+
+  /* mobile top nav (shown < 900px) */
+  .mobilenav{ display:none; }
+
+  /* ---------- MAIN ---------- */
+  .main{ flex:1; min-width:0; padding:28px 30px 60px 30px; }
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:fadein .15s ease; }
+  @keyframes fadein{ from{opacity:0;} to{opacity:1;} }
+
+  h2.section-title{
+    font-size:20px; font-weight:800; color:var(--paper); margin:0 0 4px 0;
+    display:flex; align-items:center; gap:10px;
+  }
+  h2.section-title::before{ content:""; width:20px; height:2px; background:var(--cyan); }
+  .lead{ color:var(--text-muted); font-size:13.5px; margin:6px 0 18px 0; line-height:1.6; max-width:680px; }
+
+  .callout{
+    border-left:2px solid var(--warn); background:rgba(255,122,84,0.08);
+    padding:10px 14px; font-size:12.5px; color:#ffd2c2; margin:0 0 14px 0;
+    font-family:'JetBrains Mono',monospace; line-height:1.6; border-radius:0 var(--radius) var(--radius) 0;
+  }
+  .callout b{ color:var(--warn); }
+  .callout.ok{ border-left-color:var(--ok); background:rgba(143,208,160,0.08); color:#d3ecd8; }
+  .callout.ok b{ color:var(--ok); }
+
+  /* stat cards (overview + per-tab quick stats) */
+  .stat-row{ display:flex; gap:12px; flex-wrap:wrap; margin:0 0 22px 0; }
+  .stat-card{
+    border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px; flex:1; min-width:150px;
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; background:rgba(14,44,71,0.35);
+  }
+  .stat-card .v{ font-size:21px; color:var(--cyan); font-weight:700; display:block; margin-bottom:2px; }
+  .stat-card .k{ color:var(--text-muted); }
+
+  /* overview dashboard cards */
+  .dash-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:4px; }
+  .dash-card{
+    border:1px solid var(--line); border-radius:var(--radius); background:var(--panel);
+    padding:18px 20px; cursor:pointer; transition:border-color .15s, background .15s;
+  }
+  .dash-card:hover{ border-color:var(--cyan); background:var(--panel-alt); }
+  .dash-card .dh{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .dash-card .ico2{
+    width:30px;height:30px;border-radius:50%;border:1px solid var(--cyan-dim);
+    display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+    font-size:11px;color:var(--cyan);flex:none;
+  }
+  .dash-card h3{ margin:0; font-size:15.5px; color:var(--paper); font-weight:700; }
+  .dash-card p{ margin:0 0 10px 0; font-size:12.5px; color:var(--text-muted); line-height:1.55; }
+  .dash-card .chiprow{ display:flex; gap:6px; flex-wrap:wrap; }
+  .dash-card .chip{
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cyan-dim);
+    border:1px solid var(--line); border-radius:20px; padding:3px 9px;
+  }
+
+  /* collapsible day/section blocks */
+  details.dblock{
+    border:1px solid var(--line-soft); border-radius:var(--radius); margin-bottom:10px; overflow:hidden;
+    background:rgba(255,255,255,0.012);
+  }
+  details.dblock[open]{ border-color:var(--line); }
+  details.dblock summary{
+    list-style:none; cursor:pointer; padding:11px 14px;
+    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--paper);
+    background:rgba(127,209,232,0.07);
+  }
+  details.dblock summary::-webkit-details-marker{ display:none; }
+  details.dblock summary::before{
+    content:"+"; color:var(--cyan); font-weight:700; margin-right:8px; width:10px; display:inline-block;
+  }
+  details.dblock[open] summary::before{ content:"–"; }
+  details.dblock summary .tag{ color:var(--cyan-dim); font-size:10.5px; }
+  details.dblock .dbody{ padding:14px 14px 4px 14px; }
+  details.dblock .dbody details.dblock{ margin-left:6px; background:rgba(0,0,0,0.12); }
+  .toggle-all{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--cyan-dim);
+    background:transparent; border:1px solid var(--line); border-radius:20px; padding:5px 12px;
+    cursor:pointer; margin-bottom:14px;
+  }
+  .toggle-all:hover{ color:var(--cyan); border-color:var(--cyan); }
+
+  table{ width:100%; border-collapse:collapse; margin:0 0 6px 0; font-size:12.8px; }
+  th{
+    text-align:left; font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.05em; color:var(--cyan-dim); border-bottom:1px solid var(--line); padding:7px 9px; font-weight:500;
+  }
+  td{ padding:8px 9px; border-bottom:1px solid var(--line-soft); color:var(--text); vertical-align:top; }
+  tr:hover td{ background:rgba(127,209,232,0.04); }
+  td.num, th.num{ font-family:'JetBrains Mono',monospace; color:var(--cyan); white-space:nowrap; }
+  .note{ font-size:11.5px; color:var(--text-muted); margin:6px 0 4px 0; line-height:1.5; }
+  ul.plain, ol.plain{ margin:0 0 4px 0; padding-left:18px; color:var(--text); font-size:13px; line-height:1.7; }
+  ul.plain li::marker, ol.plain li::marker{ color:var(--cyan); font-family:'JetBrains Mono',monospace; font-weight:700; }
+
+
+  /* ---------- Struktur: Unterreiter, Karten, Heute-Box ---------- */
+  .subnav{ display:flex; gap:6px; flex-wrap:wrap; margin:0 0 20px 0; padding-bottom:14px; border-bottom:1px solid var(--line-soft); }
+  .pill{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-muted); background:transparent;
+    border:1px solid var(--line); border-radius:20px; padding:7px 16px; cursor:pointer;
+  }
+  .pill:hover{ color:var(--cyan); border-color:var(--cyan); }
+  .pill.active{ background:var(--cyan); color:var(--sidebar); border-color:var(--cyan); font-weight:700; }
+  .subpanel{ display:none; }
+  .subpanel.active{ display:block; animation:fadein .15s ease; }
+  h3.sub-h{
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--cyan-dim); margin:26px 0 12px 0; font-weight:500; display:flex; align-items:center; gap:10px;
+  }
+  h3.sub-h::after{ content:""; flex:1; height:1px; background:var(--line-soft); }
+  .subpanel > h3.sub-h:first-child, .panel > h3.sub-h:first-child{ margin-top:4px; }
+  .muted{ color:var(--text-muted); }
+  .mchip{
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cyan-dim); white-space:nowrap;
+    border:1px solid var(--line); border-radius:20px; padding:2px 9px; display:inline-block;
+  }
+  .mchip.cold{ color:#9fd8f0; border-color:#4f93ac; }
+  .mchip.hot{ color:#ffb08f; border-color:#a8573a; }
+  .mk{
+    flex:none; width:20px; height:20px; border-radius:50%; border:1px solid var(--line);
+    font-family:'JetBrains Mono',monospace; font-size:10px; display:inline-flex; align-items:center; justify-content:center;
+  }
+  .mk.F{ color:var(--cyan); border-color:var(--cyan-dim); }
+  .mk.L{ color:var(--ok); border-color:var(--ok); }
+  .mk.D{ color:var(--warn); border-color:var(--warn); }
+  .mk.S{ color:var(--text-muted); border-color:var(--line); }
+
+  /* Heute-Box */
+  .todaybox{
+    border:1px solid var(--cyan-dim); border-radius:var(--radius); background:rgba(127,209,232,0.06);
+    padding:14px 16px; margin:0 0 6px 0;
+  }
+  .todaybox .th{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .todaybox .tday{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:var(--cyan); }
+  .todaybox .tcook{ margin-top:10px; padding-top:10px; border-top:1px solid var(--line-soft); font-size:12.5px; color:var(--text-muted); line-height:1.6; }
+  .todaybox .tcook b{ color:var(--paper); font-weight:600; }
+
+  /* Tageskarten */
+  .daygrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(235px,1fr)); gap:12px; margin-bottom:6px; }
+  .daycard{ border:1px solid var(--line-soft); border-radius:var(--radius); background:var(--panel); padding:12px 14px 10px 14px; }
+  .daycard.today{ border-color:var(--cyan); box-shadow:inset 0 0 0 1px var(--cyan); }
+  .daycard .dh{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; color:var(--paper); font-size:14px; }
+  .mrow{ display:flex; gap:9px; align-items:center; padding:6px 0; border-top:1px solid var(--line-soft); font-size:13px; }
+  .mrow.muted{ color:var(--text-muted); }
+  button.lnk{ background:none; border:0; padding:0; color:var(--text); font:inherit; text-align:left; cursor:pointer; }
+  button.lnk:hover{ color:var(--cyan); text-decoration:underline; }
+  .dfoot{ display:flex; gap:12px; flex-wrap:wrap; margin-top:6px; padding-top:8px; border-top:1px solid var(--line);
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--cyan-dim); }
+  tr.today td{ background:rgba(127,209,232,0.10); }
+
+  /* Rezepte */
+  .filters{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:6px; }
+  .tbtn{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--cyan-dim); background:transparent; border:1px solid var(--line); border-radius:20px; padding:6px 12px; cursor:pointer; margin-left:auto; }
+  .tbtn:hover{ color:var(--cyan); border-color:var(--cyan); }
+  details.rcard{ border:1px solid var(--line-soft); border-left:3px solid var(--line); border-radius:var(--radius); margin-bottom:8px; background:rgba(255,255,255,0.012); }
+  details.rcard[data-cat="F"]{ border-left-color:var(--cyan-dim); }
+  details.rcard[data-cat="L"]{ border-left-color:var(--ok); }
+  details.rcard[data-cat="D"]{ border-left-color:var(--warn); }
+  details.rcard[open]{ border-color:var(--line); }
+  details.rcard summary{ list-style:none; cursor:pointer; padding:10px 12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  details.rcard summary::-webkit-details-marker{ display:none; }
+  details.rcard summary:hover{ background:rgba(127,209,232,0.05); }
+  details.rcard .rt{ color:var(--paper); font-weight:600; font-size:14px; flex:1 1 200px; }
+  details.rcard .rchips{ display:flex; gap:5px; flex-wrap:wrap; }
+  details.rcard .rbody{ padding:4px 14px 12px 14px; }
+  .rwhen{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-muted); margin:0 0 10px 0; }
+  .rwhen b{ color:var(--cyan); font-weight:500; }
+  .rgrid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:20px; }
+  .rgrid ol.plain{ padding-left:20px; }
+
+  /* Einkauf */
+  .shopgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:12px; margin-bottom:16px; }
+  .storecard{ border:1px solid var(--line-soft); border-radius:var(--radius); background:var(--panel); padding:4px 14px 8px 14px; }
+  .storecard .sh2{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 0 8px 0; color:var(--paper); font-size:13.5px; border-bottom:1px solid var(--line); margin-bottom:2px; }
+  .sitem{ display:grid; grid-template-columns:20px minmax(0,1fr) auto; column-gap:8px; row-gap:1px; padding:7px 0; border-bottom:1px solid var(--line-soft); cursor:pointer; font-size:12.8px; }
+  .sitem:last-child{ border-bottom:0; }
+  .sitem input{ grid-row:1 / span 2; margin:2px 0 0 0; accent-color:#7fd1e8; width:15px; height:15px; }
+  .sitem .sq{ font-family:'JetBrains Mono',monospace; color:var(--cyan); white-space:nowrap; font-size:12px; }
+  .sitem .sh{ grid-column:2 / span 2; font-size:11px; color:var(--text-muted); line-height:1.4; }
+  .sitem .sh:empty{ display:none; }
+  .sitem input:checked ~ .sn, .sitem input:checked ~ .sq{ opacity:0.4; text-decoration:line-through; }
+
+  table.tight th, table.tight td{ padding-left:4px; padding-right:4px; }
+  @media(max-width:480px){
+    table.tight{ font-size:10px; } table.tight th{ font-size:8px; letter-spacing:0; }
+    .pill{ padding:6px 12px; font-size:11px; }
+    .rgrid{ grid-template-columns:1fr; gap:6px; }
+    .shopgrid{ grid-template-columns:1fr; }
+    .daygrid{ grid-template-columns:1fr; }
+    details.rcard summary{ padding:9px 10px; }
+    details.rcard .rbody{ padding:2px 10px 10px 10px; }
+  }
+  @media(max-width:700px){ .rgrid{ grid-template-columns:1fr; gap:6px; } }
+
+  .footnote{
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cyan-dim);
+    text-align:right; margin-top:30px; letter-spacing:0.03em;
+  }
+
+  /* Tabellen duerfen horizontal scrollen statt das Layout zu sprengen */
+  details.dblock .dbody{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  details.dblock .dbody table{ min-width:0; }
+
+  @media(max-width:900px){
+    .app{ flex-direction:column; }
+    .sidebar{ display:none; }
+    .mobilenav{
+      display:flex; gap:2px; overflow-x:auto; position:sticky; top:0; z-index:10;
+      background:var(--sidebar); border-bottom:1px solid var(--line); padding:10px 10px 0 10px;
+    }
+    .mobilenav .navbtn{ white-space:nowrap; border-radius:var(--radius) var(--radius) 0 0; }
+    .main{ padding:20px 16px 50px 16px; }
+    .dash-grid{ grid-template-columns:1fr; }
+  }
+
+  /* iPhone-optimiert: schmale Screens (SE bis Pro Max) */
+  @media(max-width:480px){
+    .main{ padding:14px 10px 40px 10px; }
+    h2.section-title{ font-size:17px; }
+    .lead{ font-size:12.5px; }
+    .stat-row{ gap:8px; }
+    .stat-card{ min-width:0; flex:1 1 42%; padding:9px 10px; }
+    .stat-card .v{ font-size:17px; }
+    .stat-card .k{ font-size:10px; }
+    .dash-card{ padding:14px 14px; }
+    details.dblock summary{ padding:9px 10px; font-size:11px; gap:6px; }
+    details.dblock summary .tag{ font-size:9.5px; }
+    details.dblock .dbody{ padding:10px 8px 4px 8px; }
+    details.dblock .dbody details.dblock{ margin-left:0; }
+    table{ font-size:11px; }
+    th{ font-size:9px; padding:6px 5px; white-space:nowrap; }
+    td{ padding:6px 5px; }
+    td.num, th.num{ white-space:nowrap; }
+    .callout{ font-size:11px; padding:8px 10px; }
+    .note{ font-size:10.5px; }
+    ol.plain, ul.plain{ font-size:12px; padding-left:16px; }
+    .navbtn{ font-size:12px; padding:8px 9px; }
+    .toggle-all{ font-size:9.5px; padding:4px 10px; }
+    .chip{ font-size:9px; padding:2px 7px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR (desktop) -->
+  <nav class="sidebar">
+    <div class="brand">
+      <div class="proj-no">PROJEKT · KÖRPERREKOMPOSITION</div>
+      <h1>Trainings- &amp; Korrekturplan</h1>
+      <div class="meta">REV. 9 · 05.11.2026<br>STATUS: AKTIV<br>182CM / ~82KG</div>
+    </div>
+    <ul class="navlist">
+      <li><button class="navbtn active" data-tab="overview"><span class="ico">◎</span>Übersicht</button></li>
+      <li><button class="navbtn" data-tab="mobility"><span class="ico">01</span>Mobilität</button></li>
+      <li><button class="navbtn" data-tab="food"><span class="ico">02</span>Ernährung</button></li>
+      <li><button class="navbtn" data-tab="gym"><span class="ico">03</span>Gym</button></li>
+      <li><button class="navbtn" data-tab="boxing"><span class="ico">04</span>Boxen + Cardio</button></li>
+    </ul>
+    <div class="navhint">Ernährung hat Unterreiter (Woche, Rezepte, Einkauf, Regeln). Tagesblöcke in Gym und Boxen klappen per Klick auf.</div>
+  </nav>
+
+  <!-- MOBILE TOP NAV -->
+  <nav class="mobilenav">
+    <button class="navbtn active" data-tab="overview"><span class="ico">◎</span>Übersicht</button>
+    <button class="navbtn" data-tab="mobility"><span class="ico">01</span>Mobilität</button>
+    <button class="navbtn" data-tab="food"><span class="ico">02</span>Ernährung</button>
+    <button class="navbtn" data-tab="gym"><span class="ico">03</span>Gym</button>
+    <button class="navbtn" data-tab="boxing"><span class="ico">04</span>Boxen + Cardio</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- ================= OVERVIEW ================= -->
+    <div class="panel active" id="overview">
+      <h2 class="section-title">Übersicht</h2>
+      <p class="lead">Alle vier Bereiche auf einen Blick. Klick auf eine Karte springt direkt zum Detailbereich.</p>
+
+      <div class="stat-row">
+        <div class="stat-card"><span class="v">4 + 1</span><span class="k">Gym-Tage + Boxen/Woche</span></div>
+        <div class="stat-card"><span class="v">RPE ≤ 9</span><span class="k">Sicherheits-Cap (Thalassämie)</span></div>
+        <div class="stat-card"><span class="v">Ø 2.293</span><span class="k">kcal/Tag</span></div>
+        <div class="stat-card"><span class="v">160g min.</span><span class="k">Protein/Tag — harte Grenze</span></div>
+      </div>
+
+
+      <div class="todaybox" data-today></div>
+
+      <h3 class="sub-h">Wochenübersicht</h3>
+      <table class="tight"><tr><th>Tag</th><th>Training</th><th>Frühstück</th><th>Mittag</th><th>Abend</th></tr>
+<tr data-day="Mo"><td class="num">Mo</td><td>Gym: Push</td><td>Joghurt-Bowl</td><td>Thunfisch-Protein-Bowl</td><td>Bohnen-Eintopf</td></tr><tr data-day="Di"><td class="num">Di</td><td>Gym: Pull</td><td>Toast, Ei, Tofu</td><td>Burrito-Bowl</td><td>Knuspriger Tofu</td></tr><tr data-day="Mi"><td class="num">Mi</td><td>Boxen</td><td>Toast, Ei, Tofu</td><td>Tikka-Masala-Bowl</td><td>Thunfisch-Wrap</td></tr><tr data-day="Do"><td class="num">Do</td><td>Cardio (optional)</td><td>Toast, Ei, Tofu</td><td>Linsen-Dal</td><td>Creamy Garlic Chicken</td></tr><tr data-day="Fr"><td class="num">Fr</td><td>Gym: Legs + Core</td><td>Joghurt-Bowl</td><td>Poke-Bowl</td><td>Tikka-Masala-Bowl</td></tr><tr data-day="Sa"><td class="num">Sa</td><td>Gym: Corrective</td><td>Joghurt-Bowl</td><td>Bohnen-Eintopf</td><td>Chicken Ramen</td></tr><tr data-day="So"><td class="num">So</td><td>Ruhetag</td><td>Joghurt-Bowl</td><td>Burrito-Bowl</td><td>Creamy Garlic Chicken</td></tr>
+      </table>
+      <p class="note">Mobilität läuft täglich: morgens 5 bis 7 Min, abends 10 bis 12 Min. Dazu jeden Tag der Whey-Shake, an Toast-Tagen ein Snack.</p>
+
+      <h3 class="sub-h">Bereiche</h3>
+      <div class="dash-grid">
+        <div class="dash-card" data-goto="mobility">
+          <div class="dh"><div class="ico2">01</div><h3>Mobilität</h3></div>
+          <p>AM-Routine (5–7 Min, aktivierend) + PM-Routine (10–12 Min, dehnend). Fokus: Forward-Head-Posture, Scapula-Winging, thorakale Extension.</p>
+          <div class="chiprow"><span class="chip">AM 5–7 Min</span><span class="chip">PM 10–12 Min</span><span class="chip">täglich</span></div>
+        </div>
+        <div class="dash-card" data-goto="food">
+          <div class="dh"><div class="ico2">02</div><h3>Ernährung</h3></div>
+          <p>2 Frühstücke, 6 Mittag- und 4 Abendgerichte und 5 Snacks im Wechsel, mit Rezepten, Einkaufsliste und Häufigkeiten. Alles als Einzelportion, Mittag am Vorabend gekocht, Abendessen frisch, Mittwoch Wrap nach dem Boxen.</p>
+          <div class="chiprow"><span class="chip">Halal</span><span class="chip">Einzelportionen</span><span class="chip">ausgewogen</span><span class="chip">bento-safe</span></div>
+        </div>
+        <div class="dash-card" data-goto="gym">
+          <div class="dh"><div class="ico2">03</div><h3>Gym (v6.1)</h3></div>
+          <p>4er-Split bei Anytime Fitness: Push / Pull / Legs+Core / Corrective. Volumen auf Schwachstellen (Schulter, Arme) nachjustiert.</p>
+          <div class="chiprow"><span class="chip">Mo·Di·Fr·Sa</span><span class="chip">Deload alle 5 Wo.</span></div>
+        </div>
+        <div class="dash-card" data-goto="boxing">
+          <div class="dh"><div class="ico2">04</div><h3>Boxen + Cardio</h3></div>
+          <p>1× wöchentlich bei REALDEAL Musashi-Kosugi, plus optionaler Zone-2-Cardio-Slot für die aerobe Basis.</p>
+          <div class="chiprow"><span class="chip">Mittwoch Boxen</span><span class="chip">Do: Cardio oder Kettlebell</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MOBILITY ================= -->
+    <div class="panel" id="mobility">
+      <h2 class="section-title">Mobilität &amp; Haltungskorrektur</h2>
+      <p class="lead">Ziel: thorakale Extension, Skapula-Kontrolle, Forward-Head-Posture. Ursache ist muskulär (Radiologie 15.09.2025: keine strukturelle Schädigung) — mit 4–6 Monaten Konsistenz visuell korrigierbar. Täglich, auch an Ruhetagen.</p>
+
+      <button class="toggle-all" data-scope="mobility">Alle aufklappen</button>
+
+      <details class="dblock" open>
+        <summary><span>MORGENS · direkt nach dem Aufstehen</span><span class="tag">5–7 Min · AKTIVIEREND</span></summary>
+        <div class="dbody">
+          <table>
+            <tr><th>#</th><th>Übung</th><th class="num">Umfang</th><th>Zweck</th></tr>
+            <tr><td class="num">1</td><td>Cat-Cow (Katze-Kuh)</td><td class="num">10 Wdh., langsam</td><td>Wirbelsäule mobilisieren, Kreislauf aktivieren</td></tr>
+            <tr><td class="num">2</td><td>Thorakale Extension über Schaumstoffrolle <i>(oder 2 Tennisbälle in Socke, Segment für Segment)</i></td><td class="num">10 Wdh.</td><td>BWS-Streckung — Gegenpol zur sitzenden Rundrückenhaltung</td></tr>
+            <tr><td class="num">3</td><td>Wandengel (Wall Angels)</td><td class="num">2 × 10</td><td>Skapula-Kontrolle, Schulterblattstellung</td></tr>
+            <tr><td class="num">4</td><td>Serratus Push-up Plus (Wand oder Boden)</td><td class="num">2 × 10</td><td>Gezielt gegen linksseitiges Scapula-Winging</td></tr>
+            <tr><td class="num">5</td><td>Chin Tucks (Kinn einziehen)</td><td class="num">2 × 15</td><td>Forward-Head-Posture — Tiefenhalsmuskulatur</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details class="dblock">
+        <summary><span>ABENDS · nach der Arbeit / vor dem Schlafen</span><span class="tag">10–12 Min · DEHNEND</span></summary>
+        <div class="dbody">
+          <table>
+            <tr><th>#</th><th>Übung</th><th class="num">Umfang</th><th>Zweck</th></tr>
+            <tr><td class="num">1</td><td>Thorakale Extension über Schaumstoffrolle <i>(oder Tennisbälle)</i></td><td class="num">2 × 10</td><td>BWS-Streckung, Tagesbelastung ausgleichen</td></tr>
+            <tr><td class="num">2</td><td>Hüftbeuger-Dehnung (Couch Stretch)</td><td class="num">2 × 45s/Seite</td><td>Anteriore Beckenkippung reduzieren</td></tr>
+            <tr><td class="num">3</td><td>Türrahmen-Brustdehnung</td><td class="num">2 × 30s</td><td>Verkürzte Brustmuskulatur</td></tr>
+            <tr><td class="num">4</td><td>Latissimus-Dehnung</td><td class="num">2 × 30s/Seite</td><td>Schulterblattmobilität</td></tr>
+            <tr><td class="num">5</td><td>Levator-Scapulae-Dehnung</td><td class="num">2 × 30s/Seite</td><td>Nackenverspannung Bildschirmarbeit</td></tr>
+            <tr><td class="num">6</td><td>Kindposition mit seitlicher Rotation</td><td class="num">1 Min/Seite</td><td>Thorakale Rotation — rechtskonvexe Skoliose</td></tr>
+            <tr><td class="num">7</td><td>Rotations-Atmung (vereinfacht, Schroth-Prinzip)</td><td class="num">2 Min</td><td>In linke (konkave) Rippenseite atmen + rechter Arm über Kopf</td></tr>
+          </table>
+          <p class="note">Zu #7: Bei 9° Cobb sehr milde Skoliose (klinisch relevant meist ab 10°+). Vereinfachte Eigenversion des Schroth-Prinzips, keine Therapie — echte Schroth-Übungen bräuchten einen zertifizierten Therapeuten, bei 9° ohne Progression aber nicht nötig.</p>
+        </div>
+      </details>
+
+      <div class="callout" style="margin-top:14px;"><b>Kontraindiziert:</b> Crunches/Sit-ups. Core läuft über den Gym-Plan (Freitag). Bei akuten Schmerzen: Intensität reduzieren, nicht durchziehen.</div>
+    </div>
+
+    <!-- ================= FOOD ================= -->
+    <div class="panel" id="food">
+      <h2 class="section-title">Ernährungsplan</h2>
+      <p class="lead">Halal, Japan-sourced, alles als Einzelportion. Mittag kochst du am Vorabend, das Abendessen frisch. Mindestens 160g Protein pro Tag bei rund 2.300 kcal.</p>
+
+      <div class="stat-row">
+        <div class="stat-card"><span class="v">Ø 2.293</span><span class="k">kcal pro Tag, Spanne 2.267 bis 2.310</span></div>
+        <div class="stat-card"><span class="v">Ø 180g</span><span class="k">Protein pro Tag, niedrigster Tag 163g (Grenze 160g)</span></div>
+        <div class="stat-card"><span class="v">Ø 460g</span><span class="k">Gemüse pro Tag (Ziel mindestens 350g)</span></div>
+        <div class="stat-card"><span class="v">~50.600円</span><span class="k">pro Monat, Schätzung ±25%</span></div>
+      </div>
+
+      <div class="subnav" data-sub="food">
+        <button class="pill active" data-subtab="food-week">Woche</button>
+        <button class="pill" data-subtab="food-recipes">Rezepte</button>
+        <button class="pill" data-subtab="food-shop">Einkauf</button>
+        <button class="pill" data-subtab="food-rules">Regeln</button>
+      </div>
+
+      <div class="subpanel active" id="food-week">
+<div class="todaybox" data-today></div>
+
+<h3 class="sub-h">Wochenplan</h3>
+<div class="daygrid">
+<div class="daycard" data-day="Mo">
+<div class="dh"><b>Montag</b><span class="mchip">Gym: Push</span></div>
+<div class="mrow"><span class="mk F">F</span><button class="lnk" data-recipe="FA">Joghurt-Bowl</button></div><div class="mrow"><span class="mk L">M</span><button class="lnk" data-recipe="L4">Thunfisch-Protein-Bowl</button></div><div class="mrow"><span class="mk D">A</span><button class="lnk" data-recipe="N1">Bohnen-Eintopf</button></div><div class="mrow muted"><span class="mk S">S</span><span>nur Whey</span></div>
+<div class="dfoot"><span>2.299 kcal</span><span>161,5g Protein</span><span>560g Gemüse</span></div>
+</div>
+<div class="daycard" data-day="Di">
+<div class="dh"><b>Dienstag</b><span class="mchip">Gym: Pull</span></div>
+<div class="mrow"><span class="mk F">F</span><button class="lnk" data-recipe="FB">Toast, Ei, Tofu</button></div><div class="mrow"><span class="mk L">M</span><button class="lnk" data-recipe="L1">Burrito-Bowl</button></div><div class="mrow"><span class="mk D">A</span><button class="lnk" data-recipe="D5">Knuspriger Tofu</button></div><div class="mrow"><span class="mk S">S</span><button class="lnk" data-recipe="S4">Chia-Pudding mit Beeren</button></div>
+<div class="dfoot"><span>2.304 kcal</span><span>175,6g Protein</span><span>420g Gemüse</span></div>
+</div>
+<div class="daycard" data-day="Mi">
+<div class="dh"><b>Mittwoch</b><span class="mchip">Boxen</span></div>
+<div class="mrow"><span class="mk F">F</span><button class="lnk" data-recipe="FB">Toast, Ei, Tofu</button></div><div class="mrow"><span class="mk L">M</span><button class="lnk" data-recipe="L3">Tikka-Masala-Bowl</button></div><div class="mrow"><span class="mk D">A</span><button class="lnk" data-recipe="D3">Thunfisch-Wrap</button></div><div class="mrow"><span class="mk S">S</span><button class="lnk" data-recipe="S2">Protein-Pfannkuchen</button></div>
+<div class="dfoot"><span>2.299 kcal</span><span>179,4g Protein</span><span>370g Gemüse</span></div>
+</div>
+<div class="daycard" data-day="Do">
+<div class="dh"><b>Donnerstag</b><span class="mchip">Cardio (optional)</span></div>
+<div class="mrow"><span class="mk F">F</span><button class="lnk" data-recipe="FB">Toast, Ei, Tofu</button></div><div class="mrow"><span class="mk L">M</span><button class="lnk" data-recipe="L5">Linsen-Dal</button></div><div class="mrow"><span class="mk D">A</span><button class="lnk" data-recipe="D1">Creamy Garlic Chicken</button></div><div class="mrow"><span class="mk S">S</span><button class="lnk" data-recipe="S1">Thunfisch-Onigiri</button></div>
+<div class="dfoot"><span>2.301 kcal</span><span>182,9g Protein</span><span>440g Gemüse</span></div>
+</div>
+<div class="daycard" data-day="Fr">
+<div class="dh"><b>Freitag</b><span class="mchip">Gym: Legs + Core</span></div>
+<div class="mrow"><span class="mk F">F</span><button class="lnk" data-recipe="FA">Joghurt-Bowl</button></div><div class="mrow"><span class="mk L">M</span><button class="lnk" data-recipe="L2">Poke-Bowl</button></div><div class="mrow"><span class="mk D">A</span><button class="lnk" data-recipe="L3">Tikka-Masala-Bowl</button></div><div class="mrow muted"><span class="mk S">S</span><span>nur Whey</span></div>
+<div class="dfoot"><span>2.304 kcal</span><span>174,3g Protein</span><span>410g Gemüse</span></div>
+</div>
+<div class="daycard" data-day="Sa">
+<div class="dh"><b>Samstag</b><span class="mchip">Gym: Corrective</span></div>
+<div class="mrow"><span class="mk F">F</span><button class="lnk" data-recipe="FA">Joghurt-Bowl</button></div><div class="mrow"><span class="mk L">M</span><button class="lnk" data-recipe="N1">Bohnen-Eintopf</button></div><div class="mrow"><span class="mk D">A</span><button class="lnk" data-recipe="D2">Chicken Ramen</button></div><div class="mrow muted"><span class="mk S">S</span><span>nur Whey</span></div>
+<div class="dfoot"><span>2.267 kcal</span><span>175,1g Protein</span><span>530g Gemüse</span></div>
+</div>
+<div class="daycard" data-day="So">
+<div class="dh"><b>Sonntag</b><span class="mchip">Ruhetag</span></div>
+<div class="mrow"><span class="mk F">F</span><button class="lnk" data-recipe="FA">Joghurt-Bowl</button></div><div class="mrow"><span class="mk L">M</span><button class="lnk" data-recipe="L1">Burrito-Bowl</button></div><div class="mrow"><span class="mk D">A</span><button class="lnk" data-recipe="D1">Creamy Garlic Chicken</button></div><div class="mrow muted"><span class="mk S">S</span><span>nur Whey</span></div>
+<div class="dfoot"><span>2.268 kcal</span><span>198,1g Protein</span><span>480g Gemüse</span></div>
+</div>
+</div>
+<p class="note">F = Frühstück, M = Mittag, A = Abend, S = Snack. Jeden Tag kommt zusätzlich der Whey-Shake (30g) dazu. Ein Klick auf ein Gericht öffnet das Rezept. Gemüse zählt Mais und Dosentomaten mit, Hülsenfrüchte nicht.</p>
+
+<h3 class="sub-h">Tagesbilanz</h3>
+<table class="tight"><tr><th>Tag</th><th class="num">kcal</th><th class="num">Protein</th><th class="num">Gemüse</th><th class="num">Obst</th><th class="num">Ballast.</th><th class="num">Fett</th><th class="num">KH</th></tr>
+<tr data-day="Mo"><td class="num">Mo</td><td class="num">2.299</td><td class="num"><b>161,5g</b></td><td class="num">560g</td><td class="num">200g</td><td class="num">38g</td><td class="num">30%</td><td class="num">42%</td></tr>
+<tr data-day="Di"><td class="num">Di</td><td class="num">2.304</td><td class="num"><b>175,6g</b></td><td class="num">420g</td><td class="num">50g</td><td class="num">30g</td><td class="num">30%</td><td class="num">40%</td></tr>
+<tr data-day="Mi"><td class="num">Mi</td><td class="num">2.299</td><td class="num"><b>179,4g</b></td><td class="num">370g</td><td class="num">70g</td><td class="num">24g</td><td class="num">29%</td><td class="num">41%</td></tr>
+<tr data-day="Do"><td class="num">Do</td><td class="num">2.301</td><td class="num"><b>182,9g</b></td><td class="num">440g</td><td class="num">0g</td><td class="num">29g</td><td class="num">27%</td><td class="num">41%</td></tr>
+<tr data-day="Fr"><td class="num">Fr</td><td class="num">2.304</td><td class="num"><b>174,3g</b></td><td class="num">410g</td><td class="num">200g</td><td class="num">27g</td><td class="num">31%</td><td class="num">39%</td></tr>
+<tr data-day="Sa"><td class="num">Sa</td><td class="num">2.267</td><td class="num"><b>175,1g</b></td><td class="num">530g</td><td class="num">200g</td><td class="num">35g</td><td class="num">28%</td><td class="num">41%</td></tr>
+<tr data-day="So"><td class="num">So</td><td class="num">2.268</td><td class="num"><b>198,1g</b></td><td class="num">480g</td><td class="num">200g</td><td class="num">31g</td><td class="num">23%</td><td class="num">42%</td></tr>
+<tr><td class="num"><b>Ø</b></td><td class="num"><b>2.292</b></td><td class="num"><b>178,1g</b></td><td class="num"><b>460g</b></td><td class="num"><b>130g</b></td><td class="num"><b>31g</b></td><td class="num"><b>28%</b></td><td class="num"><b>41%</b></td></tr>
+</table>
+<p class="note">Fett und KH sind Anteile an der Tagesenergie. Der niedrigste Proteintag ist Mo mit 161,5g. Selbst wenn dein Hähnchen nur 18g Protein pro 100g hat und der Tofu nur 6,5g, liegt jeder Tag bei mindestens 160g.</p>
+<div class="callout ok"><b>Tauschregel:</b> Mittag und Abend lassen sich nur innerhalb ähnlicher Kalorien tauschen (Gerichte liegen bei 644 bis 745 kcal, der Tag verschiebt sich um höchstens etwa 100 kcal). Das Frühstück A (Joghurt-Bowl) braucht keinen Snack. Bei Frühstück B (Toast mit Ei) gehört der Snack fest dazu, sonst fehlen rund 190 bis 260 kcal und 14 bis 23g Protein. Mi (Boxen) bleibt der Wrap, er ist das einzige Gericht ohne Kochen.</div>
+
+<h3 class="sub-h">Snack-Rotation · 3 Wochen</h3>
+<table class="tight"><tr><th>Woche</th><th>Di</th><th>Mi</th><th>Do</th></tr>
+<tr><td class="num">1</td><td><button class="lnk" data-recipe="S4">Chia-Pudding mit Beeren</button></td><td><button class="lnk" data-recipe="S2">Protein-Pfannkuchen</button></td><td><button class="lnk" data-recipe="S1">Thunfisch-Onigiri</button></td></tr>
+<tr><td class="num">2</td><td><button class="lnk" data-recipe="S5">Süßkartoffel + SAVAS</button></td><td><button class="lnk" data-recipe="S2">Protein-Pfannkuchen</button></td><td><button class="lnk" data-recipe="S3">SAVAS Soy Protein Bar</button></td></tr>
+<tr><td class="num">3</td><td><button class="lnk" data-recipe="S1">Thunfisch-Onigiri</button></td><td><button class="lnk" data-recipe="S2">Protein-Pfannkuchen</button></td><td><button class="lnk" data-recipe="S4">Chia-Pudding mit Beeren</button></td></tr>
+</table>
+<p class="note">Die Tageswerte in der Tabelle oben gelten für Woche 1. Beim Tauschen verschiebt sich ein Tag um höchstens etwa 30 kcal. Am Mittwoch gibt es keinen Thunfisch-Snack, weil abends schon der Thunfisch-Wrap kommt. Alle Snacks sind Einzelportionen.</p>
+
+<h3 class="sub-h">Kochplan pro Abend</h3>
+<table><tr><th>Abend</th><th>Abendessen frisch</th><th>Mittag für morgen</th><th class="num">Zeit</th></tr>
+<tr data-day="Mo"><td class="num">Mo</td><td>Bohnen-Eintopf</td><td>Burrito-Bowl <span class="muted">für Di</span></td><td class="num">45 Min</td></tr>
+<tr data-day="Di"><td class="num">Di</td><td>Knuspriger Tofu</td><td>Tikka-Masala-Bowl <span class="muted">für Mi</span></td><td class="num">50 Min</td></tr>
+<tr data-day="Mi"><td class="num">Mi</td><td>Thunfisch-Wrap <span class="muted">(kein Kochen)</span></td><td>Linsen-Dal <span class="muted">für Do</span></td><td class="num">30 Min</td></tr>
+<tr data-day="Do"><td class="num">Do</td><td>Creamy Garlic Chicken</td><td>Poke-Bowl <span class="muted">für Fr</span></td><td class="num">40 Min</td></tr>
+<tr data-day="Fr"><td class="num">Fr</td><td>Tikka-Masala-Bowl</td><td>Bohnen-Eintopf <span class="muted">für Sa</span></td><td class="num">45 Min</td></tr>
+<tr data-day="Sa"><td class="num">Sa</td><td>Chicken Ramen</td><td>Burrito-Bowl <span class="muted">für So</span></td><td class="num">40 Min</td></tr>
+<tr data-day="So"><td class="num">So</td><td>Creamy Garlic Chicken</td><td>Thunfisch-Protein-Bowl <span class="muted">für Mo</span></td><td class="num">40 Min</td></tr>
+</table>
+<p class="note">Reihenfolge: erst das Mittagessen für morgen ansetzen, dann das Abendessen kochen und essen, zuletzt das Mittagessen verpacken und in den Kühlschrank stellen. Mittagessen für Büro-Tage (Di, Mi, Do) vorher kontrollieren. Die Zeiten sind Richtwerte inklusive Schneiden und Abwasch.</p>
+</div>
+      <div class="subpanel" id="food-recipes">
+<div class="filters">
+<button class="pill active" data-filter="all">Alle</button>
+<button class="pill" data-filter="F">Frühstück</button>
+<button class="pill" data-filter="L">Mittag</button>
+<button class="pill" data-filter="D">Abend</button>
+<button class="pill" data-filter="S">Snacks</button>
+<button class="pill" data-filter="T">Technik</button>
+<button class="tbtn rtoggle">Alle aufklappen</button>
+</div>
+<div class="rgroup" data-cat="F"><h3 class="sub-h">Frühstück · 2 Varianten, deine Standards</h3>
+<details class="rcard" id="r-FA" data-cat="F">
+<summary><span class="mk F">F</span><span class="rt">Joghurt-Bowl</span><span class="rchips"><span class="mchip ">792 kcal</span><span class="mchip ">42,3g Protein</span><span class="mchip ">7 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Mo, Fr, Sa, So</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Griech. Joghurt Parutheno (パルテノ, plain, ohne Zucker)</td><td class="num">280 g</td></tr><tr><td>Proteinmilch SAVAS (ザバス)</td><td class="num">50 ml</td></tr><tr><td>Haferflocken</td><td class="num">45 g</td></tr><tr><td>Banane</td><td class="num">1 kleine (100 g)</td></tr><tr><td>Mandeln</td><td class="num">15 g</td></tr><tr><td>Walnüsse</td><td class="num">8 g</td></tr><tr><td>TK-Beeren (Mixed Berry)</td><td class="num">50 g</td></tr><tr><td>TK-Mango</td><td class="num">50 g</td></tr><tr><td>Himbeersirup</td><td class="num">8 g</td></tr><tr><td>Cookie, gerieben (als Topping)</td><td class="num">10 g</td></tr></table><p class="note">Fett 30,0g, Kohlenhydrate 88,1g, Ballaststoffe ca. 11g.</p></div>
+<div><ol class="plain"><li>Parutheno in eine Schüssel geben, Proteinmilch unterrühren (nur 50 ml, sonst wird die Bowl zu flüssig)</li><li>Haferflocken einrühren und kurz quellen lassen</li><li>TK-Beeren und TK-Mango antauen lassen (5 bis 10 Min bei Zimmertemperatur oder kurz in der Mikrowelle), dann obendrauf</li><li>Banane in Scheiben, Mandeln und Walnüsse grob gehackt darüber</li><li>Himbeersirup darüber, Cookie zum Schluss darüberreiben</li></ol><p class="note">Proteinmilch bewusst nur 50 ml. Eine angebrochene Flasche hält nur wenige Tage, den Rest in 50-ml-Portionen einfrieren.</p></div>
+</div></div></details>
+<details class="rcard" id="r-FB" data-cat="F">
+<summary><span class="mk F">F</span><span class="rt">Toast, Ei, Tofu</span><span class="rchips"><span class="mchip ">600 kcal</span><span class="mchip ">32,7g Protein</span><span class="mchip ">8 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Di, Mi, Do</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Toastbrot</td><td class="num">2 Scheiben (120 g)</td></tr><tr><td>Ei</td><td class="num">3 Stk. (150 g)</td></tr><tr><td>Tofu momen (fest)</td><td class="num">50 g</td></tr><tr><td>Butter</td><td class="num">5 g</td></tr></table><p class="note">Fett 26,9g, Kohlenhydrate 57,0g, Ballaststoffe ca. 5g.</p></div>
+<div><ol class="plain"><li>Toast in den Toaster</li><li>Butter in der beschichteten Pfanne erhitzen, Tofu gewürfelt 2 bis 3 Min anbraten, bis er leicht gebräunt ist</li><li>3 Eier verquirlen, dazugeben und unter Rühren wie Rührei stocken lassen (2 bis 3 Min)</li><li>Mit Salz und Pfeffer würzen, auf dem Toast oder daneben servieren</li></ol><p class="note">Schnell für Bürotage. Der Tofu ist optional, ein viertes Ei ersetzt ihn.</p></div>
+</div></div></details></div>
+<div class="rgroup" data-cat="L"><h3 class="sub-h">Mittag · am Vorabend gekocht · 5 Gerichte plus Bohneneintopf</h3>
+<details class="rcard" id="r-L1" data-cat="L">
+<summary><span class="mk L">M</span><span class="rt">Hähnchen-Burrito-Bowl</span><span class="rchips"><span class="mchip ">674 kcal</span><span class="mchip ">59,3g Protein</span><span class="mchip ">280g Gemüse</span><span class="mchip ">25 Min</span><span class="mchip cold">kalt mitnehmen</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Di Mittag (Büro) und So Mittag (zu Hause), am Vorabend gekocht</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Hähnchenbrust (roh, ohne Haut)</td><td class="num">200 g</td></tr><tr><td>Reis (trocken)</td><td class="num">45 g</td></tr><tr><td>Gerste, gepresst (押し麦, trocken)</td><td class="num">15 g</td></tr><tr><td>Schwarze Bohnen (Dose, abgetropft)</td><td class="num">50 g</td></tr><tr><td>Mais (Dose, abgetropft)</td><td class="num">50 g</td></tr><tr><td>Dosentomaten</td><td class="num">50 g</td></tr><tr><td>TK-Paprikastreifen</td><td class="num">40 g</td></tr><tr><td>TK-Zwiebelwürfel</td><td class="num">40 g</td></tr><tr><td>TK-Brokkoli</td><td class="num">100 g</td></tr><tr><td>Mayo, kalorienreduziert</td><td class="num">15 g</td></tr><tr><td>Canola-Öl</td><td class="num">5 g</td></tr><tr><td>Paprikapulver</td><td class="num">2 g (1 TL)</td></tr><tr><td>Kreuzkümmel (gemahlen)</td><td class="num">1 g</td></tr><tr><td>Zitronen- oder Limettensaft</td><td class="num">5 g (1 TL)</td></tr><tr><td>Salz, Pfeffer</td><td class="num">nach Geschmack</td></tr></table><p class="note">Fett 15,5g, Kohlenhydrate 74,3g, Ballaststoffe ca. 11g.</p></div>
+<div><ol class="plain"><li>Reis und Gerste kochen (siehe Grundtechniken, Wasser ca. 85 ml)</li><li>Hähnchen in mundgerechte Stücke schneiden und mit Salz, Pfeffer, Paprikapulver und Kreuzkümmel würzen</li><li>Öl in der Pfanne erhitzen, Hähnchen 8 bis 10 Min braten, bis es innen nicht mehr rosa ist</li><li>TK-Paprika, TK-Zwiebel und TK-Brokkoli ungetaut dazugeben und 4 bis 5 Min mitbraten. Bohnen, Mais und Dosentomaten zum Schluss 3 Min miterwärmen</li><li>Mayo und Limettensaft in einem kleinen Behälter verrühren</li><li>Reis unten in die Box, Hähnchenmix obendrauf, Sauce getrennt einpacken. Offen 30 bis 45 Min abkühlen lassen, dann in den Kühlschrank</li></ol><p class="note">Schmeckt kalt wie warm. Im Büro wahlweise 90 Sek in der Mikrowelle, die Sauce erst danach darübergeben.</p></div>
+</div></div></details>
+<details class="rcard" id="r-L2" data-cat="L">
+<summary><span class="mk L">M</span><span class="rt">Lachs-Poke-Bowl</span><span class="rchips"><span class="mchip ">745 kcal</span><span class="mchip ">50,9g Protein</span><span class="mchip ">220g Gemüse</span><span class="mchip ">20 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Fr Mittag (zu Hause), am Donnerstagabend gekocht</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Lachs, frisch (Namazake 生鮭)</td><td class="num">150 g</td></tr><tr><td>Reis (trocken)</td><td class="num">38 g</td></tr><tr><td>Gerste, gepresst (押し麦, trocken)</td><td class="num">12 g</td></tr><tr><td>Ei</td><td class="num">1 Stk. (50 g)</td></tr><tr><td>Edamame, TK, geschält</td><td class="num">50 g</td></tr><tr><td>Gurke</td><td class="num">40 g</td></tr><tr><td>TK-Karotte</td><td class="num">40 g</td></tr><tr><td>Kohl</td><td class="num">40 g</td></tr><tr><td>TK-Brokkoli</td><td class="num">100 g</td></tr><tr><td>Sojasauce</td><td class="num">15 g</td></tr><tr><td>Sesamöl</td><td class="num">5 g</td></tr><tr><td>Honig</td><td class="num">5 g</td></tr><tr><td>Salz, Pfeffer</td><td class="num">nach Geschmack</td></tr></table><p class="note">Fett 33,7g, Kohlenhydrate 59,6g, Ballaststoffe ca. 9g.</p></div>
+<div><ol class="plain"><li>Reis und Gerste kochen (Grundtechniken, Wasser ca. 70 ml). Während der Reis zieht, das Ei in einem kleinen Topf 10 Min hart kochen, abschrecken, schälen und halbieren</li><li>Lachs trocken tupfen und leicht salzen. In einer beschichteten Pfanne bei mittlerer Hitze erst 4 Min auf der Hautseite, dann 3 Min auf der anderen Seite braten, bis er komplett durch und nicht mehr glasig ist. Danach in grobe Flocken zerteilen</li><li>TK-Brokkoli und TK-Edamame in eine Schüssel geben, mit heißem Wasser übergießen, 3 Min stehen lassen und abtropfen</li><li>Gurke, Karotte und Kohl in feine Streifen schneiden oder hobeln</li><li>Sojasauce, Honig und Sesamöl zu einem Dressing verrühren</li><li>Reis in die Box, Lachsflocken, Gemüse und Ei darauf anrichten, Dressing getrennt einpacken</li></ol><p class="note">Der Lachs ist immer durchgegart. Namazake (生鮭) ist kein Sashimi und kommt nie roh in die Bowl. Am Donnerstag frisch kaufen.</p></div>
+</div></div></details>
+<details class="rcard" id="r-L3" data-cat="L">
+<summary><span class="mk L">M</span><span class="rt">Tikka-Masala-Bowl</span><span class="rchips"><span class="mchip ">646 kcal</span><span class="mchip ">57,0g Protein</span><span class="mchip ">190g Gemüse</span><span class="mchip ">25 Min</span><span class="mchip hot">heiß mitnehmen</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Mi Mittag (Büro, am Dienstagabend gekocht) und Fr Abend (frisch)</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Hähnchenbrust (roh, ohne Haut)</td><td class="num">200 g</td></tr><tr><td>Reis (trocken)</td><td class="num">60 g</td></tr><tr><td>Gerste, gepresst (押し麦, trocken)</td><td class="num">20 g</td></tr><tr><td>Griech. Joghurt Parutheno (パルテノ, plain, ohne Zucker)</td><td class="num">50 g</td></tr><tr><td>Dosentomaten</td><td class="num">100 g</td></tr><tr><td>TK-Paprikastreifen</td><td class="num">45 g</td></tr><tr><td>TK-Zwiebelwürfel</td><td class="num">45 g</td></tr><tr><td>Butter</td><td class="num">5 g</td></tr><tr><td>Canola-Öl</td><td class="num">3 g</td></tr><tr><td>Currypulver</td><td class="num">4 g (1 TL)</td></tr><tr><td>Paprikapulver</td><td class="num">2 g (1 TL)</td></tr><tr><td>Ingwer-Knoblauch-Paste</td><td class="num">8 g (1 TL)</td></tr><tr><td>Salz, Pfeffer</td><td class="num">nach Geschmack</td></tr></table><p class="note">Fett 13,9g, Kohlenhydrate 73,3g, Ballaststoffe ca. 7g.</p></div>
+<div><ol class="plain"><li>Reis und Gerste kochen (Grundtechniken, Wasser ca. 110 ml)</li><li>Hähnchen in Stücke schneiden und mit Currypulver, Paprikapulver und Salz vermischen</li><li>Öl in der Pfanne erhitzen, TK-Zwiebel und TK-Paprika 2 Min anschwitzen, Ingwer-Knoblauch-Paste 30 Sek mitbraten, Hähnchen dazugeben und 6 Min braten</li><li>Dosentomaten dazugeben und 8 Min köcheln lassen, bis die Sauce dick ist und das Hähnchen innen durch ist. Butter einrühren, mit Salz abschmecken</li><li>Frisch (Fr Abend): Reis auf den Teller, Sauce darüber, Parutheno kalt obendrauf</li><li>Fürs Büro (Mi): Sauce und Reis getrennt in den Kühlschrank. Am Morgen die Sauce kochend heiß erhitzen (mindestens 75 Grad), in den vorgewärmten Thermobehälter füllen, den Reis dazugeben. Parutheno kalt in einem kleinen Behälter mitnehmen</li></ol><p class="note">Parutheno nie mitkochen und nie mit aufwärmen, er gerinnt in der Hitze. Immer erst beim Essen kalt darübergeben.</p></div>
+</div></div></details>
+<details class="rcard" id="r-L4" data-cat="L">
+<summary><span class="mk L">M</span><span class="rt">Protein-Bowl mit Thunfisch</span><span class="rchips"><span class="mchip ">730 kcal</span><span class="mchip ">52,9g Protein</span><span class="mchip ">280g Gemüse</span><span class="mchip ">20 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Mo Mittag (zu Hause), am Sonntagabend gekocht</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Thunfisch (Dose in Wasser, abgetropft)</td><td class="num">140 g</td></tr><tr><td>Reis (trocken)</td><td class="num">45 g</td></tr><tr><td>Gerste, gepresst (押し麦, trocken)</td><td class="num">15 g</td></tr><tr><td>Ei</td><td class="num">2 Stk. (100 g)</td></tr><tr><td>Edamame, TK, geschält</td><td class="num">50 g</td></tr><tr><td>Kohl</td><td class="num">50 g</td></tr><tr><td>Gurke</td><td class="num">50 g</td></tr><tr><td>TK-Karotte</td><td class="num">50 g</td></tr><tr><td>Mais (Dose, abgetropft)</td><td class="num">30 g</td></tr><tr><td>TK-Brokkoli</td><td class="num">100 g</td></tr><tr><td>Mayo, kalorienreduziert</td><td class="num">15 g</td></tr><tr><td>Sojasauce</td><td class="num">10 g</td></tr><tr><td>Sesamöl</td><td class="num">5 g</td></tr><tr><td>Salz, Pfeffer</td><td class="num">nach Geschmack</td></tr></table><p class="note">Fett 26,5g, Kohlenhydrate 70,1g, Ballaststoffe ca. 11g.</p></div>
+<div><ol class="plain"><li>Reis und Gerste kochen (Grundtechniken, Wasser ca. 85 ml). Parallel die Eier 10 Min hart kochen, abschrecken, schälen und halbieren</li><li>TK-Brokkoli und TK-Edamame mit heißem Wasser übergießen, 3 Min stehen lassen und abtropfen</li><li>Kohl, Gurke und Karotte in feine Streifen schneiden</li><li>Thunfisch abtropfen lassen und mit Mayo, Mais und Sojasauce vermischen (immer gemischt, nie pur)</li><li>Reis in die Box, Sesamöl darüberträufeln, Thunfischmix, Gemüse, Edamame und Eier anrichten. Offen abkühlen lassen, dann kühlen</li></ol><p class="note">Kalt essen. Wenn du magst, vor dem Essen kurz in der Mikrowelle anwärmen.</p></div>
+</div></div></details>
+<details class="rcard" id="r-L5" data-cat="L">
+<summary><span class="mk L">M</span><span class="rt">Linsen-Dal</span><span class="rchips"><span class="mchip ">682 kcal</span><span class="mchip ">39,8g Protein</span><span class="mchip ">240g Gemüse</span><span class="mchip ">25 Min</span><span class="mchip hot">heiß mitnehmen</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Do Mittag (Büro), am Mittwochabend gekocht</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Rote Linsen (trocken)</td><td class="num">60 g</td></tr><tr><td>Reis (trocken)</td><td class="num">22 g</td></tr><tr><td>Gerste, gepresst (押し麦, trocken)</td><td class="num">8 g</td></tr><tr><td>Ei</td><td class="num">2 Stk. (100 g)</td></tr><tr><td>Griech. Joghurt Parutheno (パルテノ, plain, ohne Zucker)</td><td class="num">50 g</td></tr><tr><td>Kokosmilch</td><td class="num">50 g</td></tr><tr><td>Dosentomaten</td><td class="num">100 g</td></tr><tr><td>TK-Brokkoli</td><td class="num">100 g</td></tr><tr><td>TK-Zwiebelwürfel</td><td class="num">40 g</td></tr><tr><td>Canola-Öl</td><td class="num">3 g</td></tr><tr><td>Currypulver</td><td class="num">4 g (1 TL)</td></tr><tr><td>Ingwer-Knoblauch-Paste</td><td class="num">8 g (1 TL)</td></tr><tr><td>Salz, Pfeffer</td><td class="num">nach Geschmack</td></tr></table><p class="note">Fett 26,0g, Kohlenhydrate 72,4g, Ballaststoffe ca. 13g.</p></div>
+<div><ol class="plain"><li>Linsen kurz abspülen. Eier in einem kleinen Topf 10 Min hart kochen, abschrecken und schälen</li><li>Öl im Topf erhitzen, TK-Zwiebel, Ingwer-Knoblauch-Paste und Currypulver 2 Min anschwitzen</li><li>Linsen, Reis, Gerste, Dosentomaten und 350 ml Wasser dazugeben und 18 bis 20 Min köcheln lassen, gelegentlich umrühren. TK-Brokkoli in den letzten 5 Min dazugeben</li><li>Kokosmilch einrühren und mit Salz abschmecken. Über Nacht im Kühlschrank lagern</li><li>Am Morgen das Dal kochend heiß erhitzen (mindestens 75 Grad), in den vorgewärmten Thermobehälter füllen, Eier halbiert obenauf. Parutheno kalt in einem kleinen Behälter mitnehmen und erst vor dem Essen darübergeben</li></ol><p class="note">Reis und Linsen kochen im selben Topf. Parutheno nie mitkochen.</p></div>
+</div></div></details>
+<details class="rcard" id="r-N1" data-cat="L">
+<summary><span class="mk L">M</span><span class="rt">Spicy Bean Stew mit Tofu</span><span class="rchips"><span class="mchip ">656 kcal</span><span class="mchip ">42,2g Protein</span><span class="mchip ">280g Gemüse</span><span class="mchip ">20 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Mo Abend (frisch) und Sa Mittag (am Freitagabend gekocht)</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Kidneybohnen (Dose, abgetropft)</td><td class="num">150 g</td></tr><tr><td>Tofu momen (fest)</td><td class="num">200 g</td></tr><tr><td>Griech. Joghurt Parutheno (パルテノ, plain, ohne Zucker)</td><td class="num">100 g</td></tr><tr><td>Reis (trocken)</td><td class="num">32 g</td></tr><tr><td>Gerste, gepresst (押し麦, trocken)</td><td class="num">12 g</td></tr><tr><td>Dosentomaten</td><td class="num">150 g</td></tr><tr><td>TK-Zwiebelwürfel</td><td class="num">50 g</td></tr><tr><td>TK-Paprikastreifen</td><td class="num">80 g</td></tr><tr><td>Canola-Öl</td><td class="num">3 g</td></tr><tr><td>Chiliflocken</td><td class="num">0,5 g</td></tr><tr><td>Kreuzkümmel (gemahlen)</td><td class="num">2 g</td></tr><tr><td>Paprikapulver</td><td class="num">3 g (1 TL)</td></tr><tr><td>Knoblauchpaste (ohne Ingwer)</td><td class="num">5 g (1 TL)</td></tr><tr><td>Salz, Pfeffer</td><td class="num">nach Geschmack</td></tr></table><p class="note">Fett 18,8g, Kohlenhydrate 79,5g, Ballaststoffe ca. 16g.</p></div>
+<div><ol class="plain"><li>Reis und Gerste kochen (Grundtechniken, Wasser ca. 70 ml)</li><li>Tofu in 2-cm-Würfel schneiden, in einem Topf mit der Hälfte des Öls 4 Min goldbraun anbraten und herausnehmen</li><li>Restliches Öl in den Topf geben, TK-Zwiebel und TK-Paprika 3 Min anschwitzen, Knoblauchpaste, Paprikapulver, Kreuzkümmel und Chili 30 Sek mitrösten</li><li>Dosentomaten, Kidneybohnen und 100 ml Wasser dazugeben und 10 Min köcheln lassen, mit Salz abschmecken</li><li>Tofu wieder in den Eintopf geben und 2 Min miterwärmen</li><li>Eintopf auf dem Reis servieren, Parutheno kalt obendrauf</li></ol><p class="note">Fleischfrei und schmeckt am zweiten Tag besser. Für den Sa-Mittag am Freitagabend kochen und über Nacht kühlen, Parutheno erst beim Essen dazu. Chili nach Geschmack, 0,5 g sind mild.</p></div>
+</div></div></details></div>
+<div class="rgroup" data-cat="D"><h3 class="sub-h">Abend · frisch gekocht · 4 Gerichte</h3>
+<details class="rcard" id="r-D1" data-cat="D">
+<summary><span class="mk D">A</span><span class="rt">Creamy Garlic Chicken mit Pasta</span><span class="rchips"><span class="mchip ">682 kcal</span><span class="mchip ">72,5g Protein</span><span class="mchip ">200g Gemüse</span><span class="mchip ">20 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Do und So Abend, frisch</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Hähnchenbrust (roh, ohne Haut)</td><td class="num">220 g</td></tr><tr><td>Pasta (trocken, z. B. Penne)</td><td class="num">80 g</td></tr><tr><td>Griech. Joghurt Parutheno (パルテノ, plain, ohne Zucker)</td><td class="num">80 g</td></tr><tr><td>TK-Brokkoli</td><td class="num">100 g</td></tr><tr><td>TK-Paprikastreifen</td><td class="num">100 g</td></tr><tr><td>Canola-Öl</td><td class="num">2 g</td></tr><tr><td>Knoblauchpaste (ohne Ingwer)</td><td class="num">8 g (1 TL)</td></tr><tr><td>Zitronen- oder Limettensaft</td><td class="num">5 g (1 TL)</td></tr><tr><td>Salz, Pfeffer</td><td class="num">nach Geschmack</td></tr></table><p class="note">Fett 11,0g, Kohlenhydrate 73,3g, Ballaststoffe ca. 9g.</p></div>
+<div><ol class="plain"><li>Pasta nach Packungsanleitung in Salzwasser kochen (ca. 10 Min), vor dem Abgießen 100 ml Kochwasser aufheben</li><li>Hähnchen in Streifen schneiden, mit Salz, Pfeffer und Knoblauchpaste vermischen</li><li>Öl in einer großen Pfanne erhitzen, Hähnchen 6 bis 8 Min braten, bis es innen durch ist</li><li>TK-Paprika und TK-Brokkoli ungetaut dazugeben und 4 Min mitbraten</li><li>Pasta und 60 ml Kochwasser in die Pfanne geben und 1 Min durchschwenken. Pfanne von der Platte nehmen</li><li>Parutheno und Zitronensaft einrühren, sofort servieren</li></ol><p class="note">Der Joghurt wird nur eingerührt, nie gekocht. Sonst gerinnt er. Wer mag, nimmt etwas mehr Kochwasser für eine cremigere Sauce.</p></div>
+</div></div></details>
+<details class="rcard" id="r-D2" data-cat="D">
+<summary><span class="mk D">A</span><span class="rt">One-Pot Chicken Ramen</span><span class="rchips"><span class="mchip ">698 kcal</span><span class="mchip ">66,6g Protein</span><span class="mchip ">250g Gemüse</span><span class="mchip ">15 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Sa Abend, frisch</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Hähnchenbrust (roh, ohne Haut)</td><td class="num">180 g</td></tr><tr><td>Ramen-Nudeln (frisch)</td><td class="num">85 g</td></tr><tr><td>Ei</td><td class="num">2 Stk. (100 g)</td></tr><tr><td>Kohl</td><td class="num">100 g</td></tr><tr><td>TK-Karotte</td><td class="num">50 g</td></tr><tr><td>TK-Brokkoli</td><td class="num">100 g</td></tr><tr><td>Sojasauce</td><td class="num">10 g</td></tr><tr><td>Sesamöl</td><td class="num">5 g</td></tr><tr><td>Hühnerbrühe-Pulver (ohne Schweinefett)</td><td class="num">3 g (1 TL)</td></tr></table><p class="note">Fett 20,2g, Kohlenhydrate 62,5g, Ballaststoffe ca. 8g.</p></div>
+<div><ol class="plain"><li>500 ml Wasser mit dem Brühepulver im Topf aufkochen. Die Eier 7 bis 8 Min mitkochen, herausnehmen, abschrecken und schälen</li><li>Hähnchen in dünne Streifen schneiden und 6 bis 7 Min in der Brühe garen, bis es innen durch ist</li><li>Kohl, Karotte und TK-Brokkoli dazugeben und 3 Min köcheln lassen</li><li>Sojasauce einrühren, Ramen-Nudeln dazugeben und 2 bis 3 Min garen, bis sie weich sind</li><li>Mit Sesamöl abschmecken, Eier halbieren und obenauf legen</li></ol><p class="note">Frisch essen, die Nudeln werden aufgewärmt weich. Brühepulver und Nudeln auf Alkohol und Schweinefett prüfen (Halal).</p></div>
+</div></div></details>
+<details class="rcard" id="r-D3" data-cat="D">
+<summary><span class="mk D">A</span><span class="rt">Thunfisch-Wrap</span><span class="rchips"><span class="mchip ">670 kcal</span><span class="mchip ">48,2g Protein</span><span class="mchip ">180g Gemüse</span><span class="mchip ">5 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Mi Abend, nach dem Boxen, ohne Kochen</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Tortilla-Wrap</td><td class="num">90 g (1 große)</td></tr><tr><td>Thunfisch (Dose in Wasser, abgetropft)</td><td class="num">140 g</td></tr><tr><td>Käsestick (さけるチーズ)</td><td class="num">1 Stk. (25 g)</td></tr><tr><td>Edamame, TK, geschält</td><td class="num">80 g</td></tr><tr><td>Salat</td><td class="num">80 g</td></tr><tr><td>Gurke</td><td class="num">70 g</td></tr><tr><td>Mais (Dose, abgetropft)</td><td class="num">30 g</td></tr><tr><td>Mayo, kalorienreduziert</td><td class="num">15 g</td></tr></table><p class="note">Fett 24,8g, Kohlenhydrate 63,3g, Ballaststoffe ca. 9g.</p></div>
+<div><ol class="plain"><li>Thunfisch abtropfen lassen und mit Mayo und Mais vermischen (immer gemischt, nie pur)</li><li>Salat und Gurke in feine Streifen schneiden</li><li>Wrap kurz in der Pfanne oder Mikrowelle anwärmen, Salat, Gurke und Thunfischmix darauf verteilen und fest einrollen</li><li>Edamame mit heißem Wasser übergießen und als Beilage essen, dazu den Käsestick</li></ol><p class="note">Kein Kochen: der Abend nach dem Boxen am Mittwoch.</p></div>
+</div></div></details>
+<details class="rcard" id="r-D5" data-cat="D">
+<summary><span class="mk D">A</span><span class="rt">Knuspriger Tofu mit Teriyaki-Nudeln</span><span class="rchips"><span class="mchip ">720 kcal</span><span class="mchip ">37,2g Protein</span><span class="mchip ">140g Gemüse</span><span class="mchip ">25 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Di Abend, frisch</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Tofu momen (fest)</td><td class="num">200 g</td></tr><tr><td>Soba (trocken)</td><td class="num">60 g</td></tr><tr><td>Ei</td><td class="num">1 Stk. (50 g)</td></tr><tr><td>Kohl</td><td class="num">80 g</td></tr><tr><td>Edamame, TK, geschält</td><td class="num">50 g</td></tr><tr><td>TK-Paprikastreifen</td><td class="num">30 g</td></tr><tr><td>TK-Karotte</td><td class="num">30 g</td></tr><tr><td>Kartoffelstärke (片栗粉)</td><td class="num">10 g</td></tr><tr><td>Canola-Öl</td><td class="num">5 g</td></tr><tr><td>Sojasauce</td><td class="num">15 g</td></tr><tr><td>Honig</td><td class="num">10 g</td></tr><tr><td>Sesamöl</td><td class="num">5 g</td></tr><tr><td>Knoblauchpaste (ohne Ingwer)</td><td class="num">3 g</td></tr><tr><td>Salz, Pfeffer</td><td class="num">nach Geschmack</td></tr></table><p class="note">Fett 29,7g, Kohlenhydrate 75,9g, Ballaststoffe ca. 8g.</p></div>
+<div><ol class="plain"><li>Tofu 10 Min in Küchenpapier mit einem Teller beschwert pressen, dann würfeln und in der Stärke wenden</li><li>Soba nach Packung kochen, kalt abspülen und abtropfen</li><li>Tofu in einer antihaftbeschichteten Pfanne mit dem Frittieröl 6 bis 8 Min rundum knusprig braten, herausnehmen</li><li>Kohl, Karotte, TK-Paprika und TK-Edamame 3 bis 4 Min in derselben Pfanne braten, Ei verquirlen und 2 Min stocken lassen</li><li>Sojasauce, Honig, Knoblauchpaste und Sesamöl verrühren, Soba und Tofu unterheben und sofort servieren</li></ol><p class="note">Knusprig nur frisch. Deshalb ein Abendgericht und kein Bento. Das Protein hängt am Tofu-Etikett.</p></div>
+</div></div></details></div>
+<div class="rgroup" data-cat="S"><h3 class="sub-h">Snacks · 5 Varianten plus täglich Whey</h3>
+<details class="rcard" id="r-S0" data-cat="S">
+<summary><span class="mk S">S</span><span class="rt">Whey-Shake</span><span class="rchips"><span class="mchip ">120 kcal</span><span class="mchip ">24,0g Protein</span><span class="mchip ">2 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Jeden Tag</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Whey-Pulver</td><td class="num">30 g</td></tr></table><p class="note">Fett 1,0g, Kohlenhydrate 3,8g, Ballaststoffe ca. 0g.</p></div>
+<div><ol class="plain"><li>30 g Pulver in ca. 250 ml Wasser schütteln. Abends anmischen und kühlen, oder Pulver und Shaker mitnehmen</li></ol><p class="note">Jeden Tag, unabhängig vom Frühstück.</p></div>
+</div></div></details>
+<details class="rcard" id="r-S1" data-cat="S">
+<summary><span class="mk S">S</span><span class="rt">Thunfisch-Onigiri</span><span class="rchips"><span class="mchip ">217 kcal</span><span class="mchip ">13,9g Protein</span><span class="mchip ">10 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Do (Rotation: Di in Woche 3)</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Reis und Gerste (trocken, 3 zu 1)</td><td class="num">40 g</td></tr><tr><td>Thunfisch (Dose in Wasser, abgetropft)</td><td class="num">70 g</td></tr><tr><td>Mayo, kalorienreduziert</td><td class="num">10 g</td></tr><tr><td>Nori (焼き海苔)</td><td class="num">½ Blatt</td></tr><tr><td>Salz</td><td class="num">1 Prise</td></tr></table><p class="note">Fett 3,9g, Kohlenhydrate 32,0g, Ballaststoffe ca. 2g. Der Thunfisch ist mit Mayo gemischt, nie pur.</p></div>
+<div><ol class="plain"><li>Am Vorabend 40 g Reis-Gerste-Mischung wie gewohnt kochen (wird zusammen mit dem Mittag für morgen angesetzt, aber als eigene Portion abgewogen) und abkühlen lassen</li><li>Thunfisch abtropfen und mit Mayo und einer Prise Salz mischen</li><li>Reis mit feuchten Händen oder Frischhaltefolie zu einem Dreieck formen, Thunfischmix in die Mitte geben und fest zudrücken</li><li>Nori erst im Büro darumwickeln, sonst wird sie weich. Kühltasche</li></ol></div>
+</div></div></details>
+<details class="rcard" id="r-S2" data-cat="S">
+<summary><span class="mk S">S</span><span class="rt">Protein-Pfannkuchen mit Banane</span><span class="rchips"><span class="mchip ">263 kcal</span><span class="mchip ">17,5g Protein</span><span class="mchip ">10 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Mi</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Haferflocken</td><td class="num">25 g</td></tr><tr><td>Banane, reif</td><td class="num">70 g</td></tr><tr><td>Whey-Pulver</td><td class="num">15 g</td></tr><tr><td>Wasser</td><td class="num">ca. 20 ml</td></tr><tr><td>Canola-Öl (zum Braten)</td><td class="num">2 g</td></tr><tr><td>Erdnussbutter (ohne Zucker)</td><td class="num">5 g</td></tr></table><p class="note">Fett 6,5g, Kohlenhydrate 36,0g, Ballaststoffe ca. 3g. Das ist eine zusätzliche Portion Whey zum täglichen Shake.</p></div>
+<div><ol class="plain"><li>Banane mit der Gabel zerdrücken, Haferflocken, Whey und Wasser unterrühren, bis ein zäher Teig entsteht</li><li>Wenig Öl in einer beschichteten Pfanne erhitzen und 3 kleine Pfannkuchen bei mittlerer Hitze je 2 Min pro Seite backen</li><li>Abkühlen lassen, dünn mit Erdnussbutter bestreichen und am Vorabend in eine Dose legen</li><li>Im Büro kalt essen oder 20 Sek in die Mikrowelle</li></ol></div>
+</div></div></details>
+<details class="rcard" id="r-S3" data-cat="S">
+<summary><span class="mk S">S</span><span class="rt">SAVAS Soy Protein Bar</span><span class="rchips"><span class="mchip ">227 kcal</span><span class="mchip ">16,5g Protein</span><span class="mchip ">1 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Rotation (Do in Woche 2)</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>SAVAS ソイプロテインバー ビターチョコ味</td><td class="num">1 Stk. (45 g)</td></tr></table><p class="note">Fett 13,7g, Kohlenhydrate 10,7g, Ballaststoffe nicht angegeben (geschätzt ca. 2g).</p></div>
+<div><ol class="plain"><li>Direkt aus der Verpackung essen, keine Kühlung nötig</li><li>Nur diese Soja-Sorte nehmen: Die anderen SAVAS Protein Bars (Chocolate 44 g, Milk Chocolate 60 g, Royal Milk Tea 38 g) enthalten zugesetztes Eisen (ピロリン酸第二鉄)</li><li>Zutatenliste prüfen: Meiji nennt weder Gelatine noch Schwein noch Alkohol, die Herkunft von Emulgator und Aroma ist aber nicht angegeben</li></ol></div>
+</div></div></details>
+<details class="rcard" id="r-S4" data-cat="S">
+<summary><span class="mk S">S</span><span class="rt">Chia-Pudding mit Beeren</span><span class="rchips"><span class="mchip ">190 kcal</span><span class="mchip ">22,5g Protein</span><span class="mchip ">5 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Di (Rotation: Do in Woche 3)</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Proteinmilch SAVAS (20 g Protein)</td><td class="num">1 Pack. (200 ml)</td></tr><tr><td>Chia-Samen</td><td class="num">12 g</td></tr><tr><td>TK-Beeren (Mixed Berry)</td><td class="num">50 g</td></tr></table><p class="note">Fett 3,9g, Kohlenhydrate 16,9g, Ballaststoffe ca. 6g.</p></div>
+<div><ol class="plain"><li>Milch und Chia-Samen in einem Glas mit Deckel verrühren, nach 10 Min noch einmal umrühren, damit nichts klumpt</li><li>TK-Beeren dazugeben und über Nacht im Kühlschrank quellen lassen (mindestens 4 Stunden)</li><li>Im Büro aus der Kühltasche löffeln</li></ol></div>
+</div></div></details>
+<details class="rcard" id="r-S5" data-cat="S">
+<summary><span class="mk S">S</span><span class="rt">Süßkartoffel mit SAVAS-Shake</span><span class="rchips"><span class="mchip ">213 kcal</span><span class="mchip ">21,0g Protein</span><span class="mchip ">2 Min</span></span></summary>
+<div class="rbody">
+<div class="rwhen">Im Plan: <b>Rotation (Di in Woche 2)</b></div>
+<div class="rgrid">
+<div><table><tr><th>Zutat</th><th class="num">1 Portion</th></tr><tr><td>Süßkartoffel, gebacken (焼き芋)</td><td class="num">70 g</td></tr><tr><td>Proteinmilch SAVAS (20 g Protein)</td><td class="num">1 Pack. (200 ml)</td></tr></table><p class="note">Fett 0,1g, Kohlenhydrate 31,4g, Ballaststoffe ca. 3g.</p></div>
+<div><ol class="plain"><li>Gebackene Süßkartoffel aus dem Supermarkt oder Konbini kaufen, kein Kochen nötig. Die Schale kann man mitessen</li><li>Dazu den Shake trinken. Die Süßkartoffel schmeckt kalt und lauwarm</li></ol></div>
+</div></div></details></div>
+<div class="rgroup" data-cat="T"><h3 class="sub-h">Grundtechniken</h3>
+<details class="rcard" id="r-TECH" data-cat="T">
+<summary><span class="mk S">+</span><span class="rt">Grundtechniken, die in mehreren Rezepten vorkommen</span></summary>
+<div class="rbody"><div class="rgrid">
+<div><table><tr><th>Technik</th><th class="num">Wichtig</th></tr>
+<tr><td>Reis mit Gerste</td><td class="num">75 % Reis, 25 % Gerste</td></tr>
+<tr><td>Wassermenge</td><td class="num">1,4 ml je g trocken</td></tr>
+<tr><td>Eier hart</td><td class="num">10 Min</td></tr>
+<tr><td>Hähnchen durch</td><td class="num">innen nicht rosa, 75 Grad</td></tr>
+<tr><td>Aufwärmen</td><td class="num">kochend heiß, 75 Grad</td></tr></table></div>
+<div><ol class="plain">
+<li><b>Reis mit Gerste (押し麦):</b> Reis und Gerste zusammen in einem Sieb waschen, bis das Wasser fast klar ist. In einen kleinen Topf geben und das 1,4-Fache des Trockengewichts in ml Wasser dazugeben (Beispiel: 60 g gesamt = ca. 85 ml). Aufkochen, Deckel drauf, 12 Min auf kleinster Stufe garen, Platte aus und 10 Min ziehen lassen. Die Platte ist in der Ziehzeit frei für die Pfanne</li>
+<li><b>Eier hart kochen:</b> Eier in kochendes Wasser geben, 10 Min kochen, sofort kalt abschrecken. Wachsweich (Ramen) 7 bis 8 Min</li>
+<li><b>Hähnchen sicher garen:</b> in Stücke schneiden, bei mittlerer Hitze braten, bis kein rosa Kern mehr zu sehen ist. Im Zweifel ein Stück aufschneiden</li>
+<li><b>Parutheno:</b> nie kochen und nie mit aufwärmen. Immer erst beim Essen kalt darübergeben</li>
+<li><b>Wieder erhitzen:</b> Gerichte vom Vorabend vor dem Essen komplett durcherhitzen, nicht nur lauwarm machen. Nur einmal aufwärmen</li>
+</ol><p class="note">Die Wassermenge ist ein Richtwert. Bei deiner Gerste und deinem Topf einmal testen und dann notieren.</p></div>
+</div></div></details></div>
+</div>
+      <div class="subpanel" id="food-shop">
+<div class="callout ok"><b>So einkaufen:</b> Gekühlte Frischware (Eier, Tofu, Toast, Ramen, Lachs, Gemüse) jede Woche, TK-Ware und Vorräte alle 2 Wochen, Whey und Gewürze alle 4 Wochen. Das schont deinen mittelgroßen Kühlschrank. Die Mengen pro Einkauf sind schon für den Rhythmus hochgerechnet. Die Haken sind nur zum Abhaken im Laden und werden beim Neuladen der Seite zurückgesetzt.</div>
+<div class="shopgrid">
+<div class="storecard"><div class="sh2"><b>🏪 Gyomu Super</b><span class="mchip">alle 2 Wochen</span></div><label class="sitem"><input type="checkbox"><span class="sn">Hähnchenbrust (roh, ohne Haut)</span><span class="sq">2.840 g</span><span class="sh">1.420 g pro Woche · 7× pro Woche (Creamy Garlic Chicken, Chicken Ramen, Burrito-Bowl, Tikka-Masala-Bowl) · TK-Packung, auf Etikett „皮なし“ (ohne Haut) achten, portionsweise auftauen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Edamame, TK, geschält</span><span class="sq">460 g</span><span class="sh">230 g pro Woche · 4× pro Woche (Thunfisch-Wrap, Knuspriger Tofu, Poke-Bowl, Thunfisch-Protein-Bowl)</span></label><label class="sitem"><input type="checkbox"><span class="sn">TK-Paprikastreifen</span><span class="sq">1.120 g</span><span class="sh">560 g pro Woche · 9× pro Woche (Creamy Garlic Chicken, Knuspriger Tofu, Burrito-Bowl, Tikka-Masala-Bowl, Bohnen-Eintopf)</span></label><label class="sitem"><input type="checkbox"><span class="sn">TK-Zwiebelwürfel</span><span class="sq">620 g</span><span class="sh">310 g pro Woche · 7× pro Woche (Burrito-Bowl, Tikka-Masala-Bowl, Linsen-Dal, Bohnen-Eintopf)</span></label><label class="sitem"><input type="checkbox"><span class="sn">TK-Karotte</span><span class="sq">340 g</span><span class="sh">170 g pro Woche · 4× pro Woche (Chicken Ramen, Knuspriger Tofu, Poke-Bowl, Thunfisch-Protein-Bowl)</span></label><label class="sitem"><input type="checkbox"><span class="sn">TK-Brokkoli</span><span class="sq">1.600 g</span><span class="sh">800 g pro Woche · 8× pro Woche (Creamy Garlic Chicken, Chicken Ramen, Burrito-Bowl, Poke-Bowl, Thunfisch-Protein-Bowl, Linsen-Dal) · Größter Gemüseposten, zwei Beutel pro Woche</span></label><label class="sitem"><input type="checkbox"><span class="sn">Käsestick (さけるチーズ)</span><span class="sq">50 g</span><span class="sh">25 g pro Woche · 1× pro Woche (Thunfisch-Wrap) · 1 Stück im Thunfisch-Wrap</span></label></div>
+<div class="storecard"><div class="sh2"><b>🥛 Yuri Store</b><span class="mchip">alle 2 Wochen</span></div><label class="sitem"><input type="checkbox"><span class="sn">Griech. Joghurt Parutheno (パルテノ, plain, ohne Zucker)</span><span class="sq">3.260 g</span><span class="sh">1.630 g pro Woche · 11× pro Woche (Creamy Garlic Chicken, Joghurt-Bowl, Tikka-Masala-Bowl, Linsen-Dal, Bohnen-Eintopf) · Normale Sorte in der 280-g-Packung (99 kcal und 4,3g Fett pro 100g), 3.260 g sind rund 12 Packungen. Der größte Posten. Mindesthaltbarkeit beachten, sonst jede Woche kaufen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Proteinmilch SAVAS (ザバス)</span><span class="sq">800 ml</span><span class="sh">400 ml pro Woche · 5× pro Woche (Joghurt-Bowl, Chia-Pudding) · Für den Chia-Pudding eine ganze 200-ml-Packung mit 20 g Protein, für die Joghurt-Bowl 4× 50 ml aus einer weiteren Packung, Rest in 50-ml-Portionen einfrieren</span></label><label class="sitem"><input type="checkbox"><span class="sn">TK-Beeren (Mixed Berry)</span><span class="sq">500 g</span><span class="sh">250 g pro Woche · 5× pro Woche (Joghurt-Bowl, Chia-Pudding)</span></label><label class="sitem"><input type="checkbox"><span class="sn">TK-Mango</span><span class="sq">400 g</span><span class="sh">200 g pro Woche · 4× pro Woche (Joghurt-Bowl)</span></label></div>
+<div class="storecard"><div class="sh2"><b>🏠 OK Store Ikuta, Vorrat</b><span class="mchip">alle 2 Wochen</span></div><label class="sitem"><input type="checkbox"><span class="sn">Reis (trocken)</span><span class="sq">818 g</span><span class="sh">409 g pro Woche · 10× pro Woche (Burrito-Bowl, Poke-Bowl, Tikka-Masala-Bowl, Thunfisch-Protein-Bowl, Linsen-Dal, Bohnen-Eintopf, Thunfisch-Onigiri) · Wird mit Gerste im Verhältnis 3 zu 1 gekocht</span></label><label class="sitem"><input type="checkbox"><span class="sn">Gerste, gepresst (押し麦, trocken)</span><span class="sq">278 g</span><span class="sh">139 g pro Woche · 10× pro Woche (Burrito-Bowl, Poke-Bowl, Tikka-Masala-Bowl, Thunfisch-Protein-Bowl, Linsen-Dal, Bohnen-Eintopf, Thunfisch-Onigiri) · Zusammen mit dem Reis kochen, hält trocken Monate</span></label><label class="sitem"><input type="checkbox"><span class="sn">Pasta (trocken, z. B. Penne)</span><span class="sq">320 g</span><span class="sh">160 g pro Woche · 2× pro Woche (Creamy Garlic Chicken)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Soba (trocken)</span><span class="sq">120 g</span><span class="sh">60 g pro Woche · 1× pro Woche (Knuspriger Tofu)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Haferflocken</span><span class="sq">410 g</span><span class="sh">205 g pro Woche · 5× pro Woche (Joghurt-Bowl, Protein-Pfannkuchen)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Rote Linsen (trocken)</span><span class="sq">120 g</span><span class="sh">60 g pro Woche · 1× pro Woche (Linsen-Dal)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Mandeln</span><span class="sq">120 g</span><span class="sh">60 g pro Woche · 4× pro Woche (Joghurt-Bowl)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Erdnussbutter (ohne Zucker)</span><span class="sq">10 g</span><span class="sh">5 g pro Woche · 1× pro Woche (Protein-Pfannkuchen) · 1 Glas reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Nori (焼き海苔)</span><span class="sq">1 Pack.</span><span class="sh">½ Blatt pro Woche · 1× pro Woche (Thunfisch-Onigiri) · 1 Packung reicht für Monate</span></label><label class="sitem"><input type="checkbox"><span class="sn">Walnüsse</span><span class="sq">64 g</span><span class="sh">32 g pro Woche · 4× pro Woche (Joghurt-Bowl)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Schwarze Bohnen (Dose, abgetropft)</span><span class="sq">200 g</span><span class="sh">100 g pro Woche · 2× pro Woche (Burrito-Bowl)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Kidneybohnen (Dose, abgetropft)</span><span class="sq">600 g</span><span class="sh">300 g pro Woche · 2× pro Woche (Bohnen-Eintopf) · rote Kidneybohnen, neu im Plan</span></label><label class="sitem"><input type="checkbox"><span class="sn">Mais (Dose, abgetropft)</span><span class="sq">320 g</span><span class="sh">160 g pro Woche · 4× pro Woche (Thunfisch-Wrap, Burrito-Bowl, Thunfisch-Protein-Bowl)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Dosentomaten</span><span class="sq">1.400 g</span><span class="sh">700 g pro Woche · 7× pro Woche (Burrito-Bowl, Tikka-Masala-Bowl, Linsen-Dal, Bohnen-Eintopf)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Thunfisch (Dose in Wasser, abgetropft)</span><span class="sq">700 g</span><span class="sh">350 g pro Woche · 3× pro Woche (Thunfisch-Wrap, Thunfisch-Protein-Bowl, Thunfisch-Onigiri)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Canola-Öl</span><span class="sq">72 g</span><span class="sh">36 g pro Woche · 11× pro Woche (Creamy Garlic Chicken, Knuspriger Tofu, Burrito-Bowl, Tikka-Masala-Bowl, Linsen-Dal, Bohnen-Eintopf, Protein-Pfannkuchen) · Fürs Braten, immer abwiegen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Sesamöl</span><span class="sq">40 g</span><span class="sh">20 g pro Woche · 4× pro Woche (Chicken Ramen, Knuspriger Tofu, Poke-Bowl, Thunfisch-Protein-Bowl) · 1 Flasche reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Mayo, kalorienreduziert</span><span class="sq">140 g</span><span class="sh">70 g pro Woche · 5× pro Woche (Thunfisch-Wrap, Burrito-Bowl, Thunfisch-Protein-Bowl, Thunfisch-Onigiri) · kalorienreduziert (ハーフ), Etikett auf Alkohol und Zutaten prüfen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Sojasauce</span><span class="sq">100 g</span><span class="sh">50 g pro Woche · 4× pro Woche (Chicken Ramen, Knuspriger Tofu, Poke-Bowl, Thunfisch-Protein-Bowl) · enthält herstellungsbedingt etwas Alkohol, alkoholfreie Sorten gibt es</span></label><label class="sitem"><input type="checkbox"><span class="sn">Honig</span><span class="sq">30 g</span><span class="sh">15 g pro Woche · 2× pro Woche (Knuspriger Tofu, Poke-Bowl)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Himbeersirup</span><span class="sq">64 g</span><span class="sh">32 g pro Woche · 4× pro Woche (Joghurt-Bowl) · 1 Flasche reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Cookie, gerieben (als Topping)</span><span class="sq">80 g</span><span class="sh">40 g pro Woche · 4× pro Woche (Joghurt-Bowl) · Vorrat, Zutatenliste auf Schweinefett prüfen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Kartoffelstärke (片栗粉)</span><span class="sq">20 g</span><span class="sh">10 g pro Woche · 1× pro Woche (Knuspriger Tofu) · 1 Packung reicht für Monate</span></label><label class="sitem"><input type="checkbox"><span class="sn">Zitronen- oder Limettensaft</span><span class="sq">40 g</span><span class="sh">20 g pro Woche · 4× pro Woche (Creamy Garlic Chicken, Burrito-Bowl) · Flasche Saft reicht</span></label><label class="sitem"><input type="checkbox"><span class="sn">Butter</span><span class="sq">50 g</span><span class="sh">25 g pro Woche · 5× pro Woche (Toast, Ei, Tofu, Tikka-Masala-Bowl) · 1 Packung reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Hühnerbrühe-Pulver (ohne Schweinefett)</span><span class="sq">6 g</span><span class="sh">3 g pro Woche · 1× pro Woche (Chicken Ramen) · neu, halal prüfen: ohne Schwein und ohne Alkohol, 1 Dose reicht für Monate</span></label></div>
+<div class="storecard"><div class="sh2"><b>🏠 OK Store Ikuta, frisch</b><span class="mchip">jede Woche</span></div><label class="sitem"><input type="checkbox"><span class="sn">Ei</span><span class="sq">17 Stk.</span><span class="sh">ca. 17 Stück pro Woche · 8× pro Woche (Chicken Ramen, Knuspriger Tofu, Toast, Ei, Tofu, Poke-Bowl, Thunfisch-Protein-Bowl, Linsen-Dal)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Tofu momen (fest)</span><span class="sq">750 g</span><span class="sh">750 g pro Woche · 6× pro Woche (Knuspriger Tofu, Toast, Ei, Tofu, Bohnen-Eintopf) · angebrochen nur 2 bis 3 Tage haltbar, Mini-Packungen (150 g) passen besser als 300 g</span></label><label class="sitem"><input type="checkbox"><span class="sn">Toastbrot</span><span class="sq">360 g</span><span class="sh">360 g pro Woche · 3× pro Woche (Toast, Ei, Tofu) · hält keine 2 Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Banane</span><span class="sq">470 g</span><span class="sh">470 g pro Woche · 5× pro Woche (Joghurt-Bowl, Protein-Pfannkuchen) · reift sonst durch</span></label><label class="sitem"><input type="checkbox"><span class="sn">Kohl</span><span class="sq">270 g</span><span class="sh">270 g pro Woche · 4× pro Woche (Chicken Ramen, Knuspriger Tofu, Poke-Bowl, Thunfisch-Protein-Bowl) · halber Kopf pro Woche</span></label><label class="sitem"><input type="checkbox"><span class="sn">Gurke</span><span class="sq">160 g</span><span class="sh">160 g pro Woche · 3× pro Woche (Thunfisch-Wrap, Poke-Bowl, Thunfisch-Protein-Bowl)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Salat</span><span class="sq">80 g</span><span class="sh">80 g pro Woche · 1× pro Woche (Thunfisch-Wrap)</span></label><label class="sitem"><input type="checkbox"><span class="sn">Ramen-Nudeln (frisch)</span><span class="sq">85 g</span><span class="sh">85 g pro Woche · 1× pro Woche (Chicken Ramen) · frisch ca. 1 Woche haltbar, für Samstag erst am Freitag oder Samstag kaufen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Lachs, frisch (Namazake 生鮭)</span><span class="sq">150 g</span><span class="sh">150 g pro Woche · 1× pro Woche (Poke-Bowl) · am Donnerstag frisch kaufen (wird Do Abend gekocht), durchgaren</span></label></div>
+<div class="storecard"><div class="sh2"><b>🎯 Don Quijote</b><span class="mchip">alle 4 Wochen</span></div><label class="sitem"><input type="checkbox"><span class="sn">Whey-Pulver</span><span class="sq">900 g</span><span class="sh">225 g pro Woche · 8× pro Woche (täglich, dazu Protein-Pfannkuchen) · 30g × 28 Tage + 15g × 4 = 900g</span></label></div>
+<div class="storecard"><div class="sh2"><b>☕ Kaldi</b><span class="mchip">alle 4 Wochen</span></div><label class="sitem"><input type="checkbox"><span class="sn">Currypulver</span><span class="sq">48 g</span><span class="sh">12 g pro Woche · 3× pro Woche (Tikka-Masala-Bowl, Linsen-Dal) · 1 Packung reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Paprikapulver</span><span class="sq">56 g</span><span class="sh">14 g pro Woche · 6× pro Woche (Burrito-Bowl, Tikka-Masala-Bowl, Bohnen-Eintopf) · 1 Packung reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Kreuzkümmel (gemahlen)</span><span class="sq">24 g</span><span class="sh">6 g pro Woche · 4× pro Woche (Burrito-Bowl, Bohnen-Eintopf) · 1 Packung reicht für Monate</span></label><label class="sitem"><input type="checkbox"><span class="sn">Chiliflocken</span><span class="sq">4,0 g</span><span class="sh">1,0 g pro Woche · 2× pro Woche (Bohnen-Eintopf) · 1 Packung reicht für Monate</span></label><label class="sitem"><input type="checkbox"><span class="sn">Kokosmilch</span><span class="sq">200 g</span><span class="sh">50 g pro Woche · 1× pro Woche (Linsen-Dal) · angebrochene Dose im Kühlschrank 2 bis 3 Tage, Rest portionsweise einfrieren</span></label><label class="sitem"><input type="checkbox"><span class="sn">Knoblauchpaste (ohne Ingwer)</span><span class="sq">116 g</span><span class="sh">29 g pro Woche · 5× pro Woche (Creamy Garlic Chicken, Knuspriger Tofu, Bohnen-Eintopf) · 1 Tube reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Ingwer-Knoblauch-Paste</span><span class="sq">96 g</span><span class="sh">24 g pro Woche · 3× pro Woche (Tikka-Masala-Bowl, Linsen-Dal) · 1 Tube reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Chia-Samen</span><span class="sq">48 g</span><span class="sh">12 g pro Woche · 1× pro Woche (Chia-Pudding) · 1 Packung reicht für Wochen</span></label><label class="sitem"><input type="checkbox"><span class="sn">Tortilla-Wrap</span><span class="sq">360 g</span><span class="sh">90 g pro Woche · 1× pro Woche (Thunfisch-Wrap) · Rest einfrieren</span></label></div>
+</div>
+
+<ul class="plain">
+<li>Die Mengen sind exakt aus den Rezepten summiert, Stückangaben (Eier) sind gerundet. Kauf bei Packungen auf, Reste von Reis, Nudeln und Öl bleiben nicht schlecht.</li>
+<li>Salz, Pfeffer und Mehl sind als Grundvorrat angenommen und nicht gelistet.</li>
+<li>Etiketten prüfen nach deiner Halal-Regel: Brühepulver, Käsestick, Cookie, Mayo, Frischnudeln, Nori und in der Rotation Soy Protein Bar ohne Schwein, Mirin und Kochsake. Sojasauce enthält herstellungsbedingt etwas Alkohol, ob das für dich passt, entscheidest du. Alkoholfreie Sorten gibt es.</li>
+<li>Den 29. jedes Monats für Fleisch-Rabatte bei Gyomu im Blick behalten.</li>
+<li>Rotation in Woche 2: Statt Chia-Pudding und Onigiri kaufst du für Dienstag eine gebackene Süßkartoffel (焼き芋, 70 g) mit einem SAVAS-Shake und für Donnerstag den SAVAS Soy Protein Bar (nur diese Soja-Sorte, die anderen enthalten zugesetztes Eisen).</li>
+<li>Kitchen Origin (Mukogaoka-Yuen) als spontane Alternative 1 bis 2× pro Woche bei Zeitnot, idealerweise kurz vor Ladenschluss für Rabatt.</li>
+</ul>
+
+<h3 class="sub-h">Wie oft kommt was vor · Häufigkeit pro Woche</h3>
+<details class="dblock"><summary><span>ALLE ZUTATEN NACH HÄUFIGKEIT</span><span class="tag">Mahlzeiten pro Woche, Menge, Einkaufsrhythmus</span></summary>
+<div class="dbody"><table class="tight"><tr><th>Zutat</th><th class="num">Mahlzeiten pro Woche</th><th class="num">Menge pro Woche</th><th class="num">Einkauf</th></tr>
+<tr><td>Canola-Öl</td><td class="num">11×</td><td class="num">36 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Griech. Joghurt Parutheno (パルテノ, plain, ohne Zucker)</td><td class="num">11×</td><td class="num">1.630 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Gerste, gepresst (押し麦, trocken)</td><td class="num">10×</td><td class="num">139 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Reis (trocken)</td><td class="num">10×</td><td class="num">409 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>TK-Paprikastreifen</td><td class="num">9×</td><td class="num">560 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Ei</td><td class="num">8×</td><td class="num">17 Stk.</td><td class="num">jede Woche</td></tr>
+<tr><td>TK-Brokkoli</td><td class="num">8×</td><td class="num">800 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Dosentomaten</td><td class="num">7×</td><td class="num">700 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Hähnchenbrust (roh, ohne Haut)</td><td class="num">7×</td><td class="num">1.420 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>TK-Zwiebelwürfel</td><td class="num">7×</td><td class="num">310 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Paprikapulver</td><td class="num">6×</td><td class="num">14 g</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Tofu momen (fest)</td><td class="num">6×</td><td class="num">750 g</td><td class="num">jede Woche</td></tr>
+<tr><td>Banane</td><td class="num">5×</td><td class="num">470 g</td><td class="num">jede Woche</td></tr>
+<tr><td>Butter</td><td class="num">5×</td><td class="num">25 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Haferflocken</td><td class="num">5×</td><td class="num">205 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Knoblauchpaste (ohne Ingwer)</td><td class="num">5×</td><td class="num">29 g</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Mayo, kalorienreduziert</td><td class="num">5×</td><td class="num">70 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Proteinmilch SAVAS (ザバス)</td><td class="num">5×</td><td class="num">400 ml</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>TK-Beeren (Mixed Berry)</td><td class="num">5×</td><td class="num">250 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Cookie, gerieben (als Topping)</td><td class="num">4×</td><td class="num">40 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Edamame, TK, geschält</td><td class="num">4×</td><td class="num">230 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Himbeersirup</td><td class="num">4×</td><td class="num">32 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Kohl</td><td class="num">4×</td><td class="num">270 g</td><td class="num">jede Woche</td></tr>
+<tr><td>Kreuzkümmel (gemahlen)</td><td class="num">4×</td><td class="num">6 g</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Mais (Dose, abgetropft)</td><td class="num">4×</td><td class="num">160 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Mandeln</td><td class="num">4×</td><td class="num">60 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Sesamöl</td><td class="num">4×</td><td class="num">20 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Sojasauce</td><td class="num">4×</td><td class="num">50 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>TK-Karotte</td><td class="num">4×</td><td class="num">170 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>TK-Mango</td><td class="num">4×</td><td class="num">200 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Walnüsse</td><td class="num">4×</td><td class="num">32 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Zitronen- oder Limettensaft</td><td class="num">4×</td><td class="num">20 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Currypulver</td><td class="num">3×</td><td class="num">12 g</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Gurke</td><td class="num">3×</td><td class="num">160 g</td><td class="num">jede Woche</td></tr>
+<tr><td>Ingwer-Knoblauch-Paste</td><td class="num">3×</td><td class="num">24 g</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Thunfisch (Dose in Wasser, abgetropft)</td><td class="num">3×</td><td class="num">350 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Toastbrot</td><td class="num">3×</td><td class="num">360 g</td><td class="num">jede Woche</td></tr>
+<tr><td>Chiliflocken</td><td class="num">2×</td><td class="num">1,0 g</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Honig</td><td class="num">2×</td><td class="num">15 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Kidneybohnen (Dose, abgetropft)</td><td class="num">2×</td><td class="num">300 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Pasta (trocken, z. B. Penne)</td><td class="num">2×</td><td class="num">160 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Schwarze Bohnen (Dose, abgetropft)</td><td class="num">2×</td><td class="num">100 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Chia-Samen</td><td class="num">1×</td><td class="num">12 g</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Erdnussbutter (ohne Zucker)</td><td class="num">1×</td><td class="num">5 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Hühnerbrühe-Pulver (ohne Schweinefett)</td><td class="num">1×</td><td class="num">3 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Kartoffelstärke (片栗粉)</td><td class="num">1×</td><td class="num">10 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Kokosmilch</td><td class="num">1×</td><td class="num">50 g</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Käsestick (さけるチーズ)</td><td class="num">1×</td><td class="num">25 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Lachs, frisch (Namazake 生鮭)</td><td class="num">1×</td><td class="num">150 g</td><td class="num">jede Woche</td></tr>
+<tr><td>Nori (焼き海苔)</td><td class="num">1×</td><td class="num">½ Blatt</td><td class="num">alle 4 Wochen</td></tr>
+<tr><td>Ramen-Nudeln (frisch)</td><td class="num">1×</td><td class="num">85 g</td><td class="num">jede Woche</td></tr>
+<tr><td>Rote Linsen (trocken)</td><td class="num">1×</td><td class="num">60 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Salat</td><td class="num">1×</td><td class="num">80 g</td><td class="num">jede Woche</td></tr>
+<tr><td>Soba (trocken)</td><td class="num">1×</td><td class="num">60 g</td><td class="num">alle 2 Wochen</td></tr>
+<tr><td>Tortilla-Wrap</td><td class="num">1×</td><td class="num">90 g</td><td class="num">alle 4 Wochen</td></tr>
+</table></div></details>
+
+<h3 class="sub-h">Kosten · Schätzung ±25%</h3>
+<table class="tight"><tr><th>Tag</th><th class="num">Frühst.</th><th class="num">Mittag</th><th class="num">Abend</th><th class="num">Snacks</th><th class="num">Tag</th></tr>
+<tr><td class="num">Mo</td><td class="num">774円</td><td class="num">555円</td><td class="num">557円</td><td class="num">135円</td><td class="num"><b>2.021円</b></td></tr>
+<tr><td class="num">Di</td><td class="num">166円</td><td class="num">521円</td><td class="num">272円</td><td class="num">361円</td><td class="num"><b>1.319円</b></td></tr>
+<tr><td class="num">Mi</td><td class="num">166円</td><td class="num">487円</td><td class="num">512円</td><td class="num">266円</td><td class="num"><b>1.430円</b></td></tr>
+<tr><td class="num">Do</td><td class="num">166円</td><td class="num">394円</td><td class="num">564円</td><td class="num">283円</td><td class="num"><b>1.406円</b></td></tr>
+<tr><td class="num">Fr</td><td class="num">774円</td><td class="num">636円</td><td class="num">487円</td><td class="num">135円</td><td class="num"><b>2.032円</b></td></tr>
+<tr><td class="num">Sa</td><td class="num">774円</td><td class="num">557円</td><td class="num">449円</td><td class="num">135円</td><td class="num"><b>1.915円</b></td></tr>
+<tr><td class="num">So</td><td class="num">774円</td><td class="num">521円</td><td class="num">564円</td><td class="num">135円</td><td class="num"><b>1.994円</b></td></tr>
+<tr><td class="num"><b>Woche</b></td><td colspan="4"></td><td class="num"><b>12.118円</b></td></tr>
+<tr><td class="num"><b>Monat</b></td><td colspan="4"></td><td class="num"><b>~52.512円</b></td></tr>
+</table>
+<div class="callout"><b>Konfidenz:</b> mittel bis niedrig. Der Parutheno-Preis (149,3円/100g) stammt aus deinem Kassenbon (418円 pro 280-g-Packung). Hähnchen (100円/100g) ist aus der alten Kostenrechnung abgeleitet. Alle anderen Preise, auch die neuen für Gerste und Kidneybohnen, sind grobe Schätzungen ohne Marktrecherche. Mit ein paar aktuellen Kassenbons lässt sich das genau rechnen.</div>
+<details class="dblock"><summary><span>PREISANNAHMEN</span><span class="tag">pro 100g bzw. 100ml</span></summary>
+<div class="dbody"><table><tr><th>Zutat</th><th class="num">Preis</th><th>Quelle</th></tr><tr><td>Banane</td><td class="num">38円</td><td>Schätzung</td></tr><tr><td>Butter</td><td class="num">225円</td><td>Schätzung</td></tr><tr><td>Canola-Öl</td><td class="num">40円</td><td>Schätzung</td></tr><tr><td>Chia-Samen</td><td class="num">800円</td><td>Schätzung</td></tr><tr><td>Chiliflocken</td><td class="num">800円</td><td>Schätzung</td></tr><tr><td>Cookie, gerieben (als Topping)</td><td class="num">350円</td><td>Schätzung</td></tr><tr><td>Currypulver</td><td class="num">400円</td><td>Schätzung</td></tr><tr><td>Dosentomaten</td><td class="num">20円</td><td>Schätzung</td></tr><tr><td>Edamame, TK, geschält</td><td class="num">60円</td><td>Schätzung</td></tr><tr><td>Ei</td><td class="num">60円</td><td>Schätzung</td></tr><tr><td>Erdnussbutter (ohne Zucker)</td><td class="num">300円</td><td>Schätzung</td></tr><tr><td>Gerste, gepresst (押し麦, trocken)</td><td class="num">55円</td><td>Schätzung</td></tr><tr><td>Griech. Joghurt Parutheno (パルテノ, plain, ohne Zucker)</td><td class="num">149,3円</td><td>Kassenbon (418円 pro 280-g-Packung)</td></tr><tr><td>Gurke</td><td class="num">70円</td><td>Schätzung</td></tr><tr><td>Haferflocken</td><td class="num">80円</td><td>Schätzung</td></tr><tr><td>Himbeersirup</td><td class="num">400円</td><td>Schätzung</td></tr><tr><td>Honig</td><td class="num">200円</td><td>Schätzung</td></tr><tr><td>Hähnchenbrust (roh, ohne Haut)</td><td class="num">100円</td><td>Schätzung</td></tr><tr><td>Hühnerbrühe-Pulver (ohne Schweinefett)</td><td class="num">400円</td><td>Schätzung</td></tr><tr><td>Ingwer-Knoblauch-Paste</td><td class="num">375円</td><td>Schätzung</td></tr><tr><td>Kartoffelstärke (片栗粉)</td><td class="num">100円</td><td>Schätzung</td></tr><tr><td>Kidneybohnen (Dose, abgetropft)</td><td class="num">100円</td><td>Schätzung</td></tr><tr><td>Knoblauchpaste (ohne Ingwer)</td><td class="num">375円</td><td>Schätzung</td></tr><tr><td>Kohl</td><td class="num">19円</td><td>Schätzung</td></tr><tr><td>Kokosmilch</td><td class="num">38円</td><td>Schätzung</td></tr><tr><td>Kreuzkümmel (gemahlen)</td><td class="num">600円</td><td>Schätzung</td></tr><tr><td>Käsestick (さけるチーズ)</td><td class="num">260円</td><td>Schätzung</td></tr><tr><td>Lachs, frisch (Namazake 生鮭)</td><td class="num">245円</td><td>Schätzung</td></tr><tr><td>Mais (Dose, abgetropft)</td><td class="num">91円</td><td>Schätzung</td></tr><tr><td>Mandeln</td><td class="num">350円</td><td>Schätzung</td></tr><tr><td>Mayo, kalorienreduziert</td><td class="num">56円</td><td>Schätzung</td></tr><tr><td>Nori (焼き海苔)</td><td class="num">600円</td><td>Schätzung</td></tr><tr><td>Paprikapulver</td><td class="num">500円</td><td>Schätzung</td></tr><tr><td>Pasta (trocken, z. B. Penne)</td><td class="num">30円</td><td>Schätzung</td></tr><tr><td>Proteinmilch SAVAS (ザバス)</td><td class="num">37円</td><td>Schätzung</td></tr><tr><td>Ramen-Nudeln (frisch)</td><td class="num">53円</td><td>Schätzung</td></tr><tr><td>Reis (trocken)</td><td class="num">75円</td><td>Schätzung</td></tr><tr><td>Rote Linsen (trocken)</td><td class="num">70円</td><td>Schätzung</td></tr><tr><td>Salat</td><td class="num">90円</td><td>Schätzung</td></tr><tr><td>Schwarze Bohnen (Dose, abgetropft)</td><td class="num">100円</td><td>Schätzung</td></tr><tr><td>Sesamöl</td><td class="num">285円</td><td>Schätzung</td></tr><tr><td>Soba (trocken)</td><td class="num">74円</td><td>Schätzung</td></tr><tr><td>Sojasauce</td><td class="num">25円</td><td>Schätzung</td></tr><tr><td>TK-Beeren (Mixed Berry)</td><td class="num">112円</td><td>Schätzung</td></tr><tr><td>TK-Brokkoli</td><td class="num">83円</td><td>Schätzung</td></tr><tr><td>TK-Karotte</td><td class="num">67円</td><td>Schätzung</td></tr><tr><td>TK-Mango</td><td class="num">112円</td><td>Schätzung</td></tr><tr><td>TK-Paprikastreifen</td><td class="num">83円</td><td>Schätzung</td></tr><tr><td>TK-Zwiebelwürfel</td><td class="num">67円</td><td>Schätzung</td></tr><tr><td>Thunfisch (Dose in Wasser, abgetropft)</td><td class="num">150円</td><td>Schätzung</td></tr><tr><td>Toastbrot</td><td class="num">44円</td><td>Schätzung</td></tr><tr><td>Tofu momen (fest)</td><td class="num">23円</td><td>Schätzung</td></tr><tr><td>Tortilla-Wrap</td><td class="num">36円</td><td>Schätzung</td></tr><tr><td>Walnüsse</td><td class="num">400円</td><td>Schätzung</td></tr><tr><td>Whey-Pulver</td><td class="num">450円</td><td>Schätzung</td></tr><tr><td>Zitronen- oder Limettensaft</td><td class="num">80円</td><td>Schätzung</td></tr></table></div></details>
+</div>
+      <div class="subpanel" id="food-rules">
+<h3 class="sub-h">Regeln des Plans</h3>
+<ul class="plain">
+<li>Halal: kein Schwein, kein Mirin, kein Kochsake.</li>
+<li>Keine Makrele, kein Spinat, keine Rote Bete, keine Zucchini.</li>
+<li>Thunfisch ist immer mit anderen Zutaten kombiniert, nie pur.</li>
+<li>Nur Einzelportionen, nichts wird in doppelter Menge gekocht.</li>
+<li>Mittag und Abend sind eigene Gerichte. Mittag wird am Vorabend gekocht, das Abendessen frisch.</li>
+<li>Frühstück nur als Joghurt-Bowl oder Toast mit Ei. Mittag, Abend und Snacks wechseln im Wochenrhythmus.</li>
+<li>Lachs einmal pro Woche am Freitag (frisch, durchgegart), an den übrigen Tagen eine Omega-3-Kapsel täglich.</li>
+<li>Mindestens 160g Protein pro Tag, Kalorien konstant bei rund 2.300.</li>
+<li>Mittwoch (Boxen) ist der Wrap-Abend, kein Kochen nach dem Training.</li>
+</ul>
+
+<h3 class="sub-h">Ausgewogen essen</h3>
+<ul class="plain">
+<li>Jedes Mittag- und Abendgericht hat vier Bausteine: eine Eiweißquelle, eine Kohlenhydratquelle, Gemüse und etwas Fett (Öl, Mayo oder Sesamöl).</li>
+<li>Gemüse liegt pro Tag bei 370 bis 560g, im Schnitt 460g. Ziel ist mindestens 350g (gängiger Richtwert in Japan, die Quelle habe ich nicht neu geprüft). Gemüse zählt ohne Hülsenfrüchte, Mais und Dosentomaten sind mitgezählt.</li>
+<li>Ballaststoffe liegen bei ca. 31g pro Tag, 25% des Reises sind durch Gerste ersetzt.</li>
+<li>Obst gibt es an Joghurt-Tagen im Frühstück, am Di (Beeren) und Mi (Banane) im Snack. Am Donnerstag gibt es keins, wer will, ergänzt eine Mandarine (ca. 50 kcal).</li>
+<li>Die Energie verteilt sich so: Frühstück 31%, Mittag 30%, Abend 30%, Snacks mit Whey 10%.</li>
+<li>Das Eiweiß ist über den Tag verteilt: Frühstück 33 bis 44g, Mittag 40 bis 59g, Abend 37 bis 73g pro Mahlzeit, dazu Whey und Snack.</li>
+<li>Der Eiweißanteil von rund 31% ist wegen Muskelaufbau im Kaloriendefizit bewusst höher als im Durchschnitt.</li>
+<li>Fett liegt im Schnitt bei 28% der Energie und damit bei etwa 0,85g pro kg Körpergewicht, am niedrigsten So mit 58g (23% der Energie). Das ist moderat, nicht low fat. Öl immer abwiegen.</li>
+<li>Pro Woche kommen rund 17 Eier zusammen, an Di und Do bis zu 5 am Tag. Ist dir das zu viel, ersetze im Frühstück B ein Ei durch 50g Tofu mehr.</li>
+</ul>
+
+<h3 class="sub-h">Anpassungsregel · nach 3 Wochen</h3>
+<ul class="plain">
+<li>Wiege dich 4 bis 5 Mal pro Woche morgens nach dem Toilettengang und bilde den 7-Tage-Durchschnitt. Miss einmal pro Woche den Taillenumfang auf Nabelhöhe.</li>
+<li>Fällt der Durchschnitt um weniger als 0,2 kg pro Woche und die Taille sinkt auch nicht, streiche täglich 20g trockenen Reis aus zwei Mahlzeiten (ca. minus 140 kcal pro Tag). Sinkt die Taille trotz stabilem Gewicht, bleibt alles, wie es ist (Rekomposition).</li>
+<li>Fällt der Durchschnitt um mehr als 0,7 kg pro Woche oder sinkt die Trainingsleistung, ergänze täglich 20g Reis in zwei Mahlzeiten (ca. plus 140 kcal pro Tag).</li>
+<li>Ändere immer nur eine Sache und warte danach 2 bis 3 Wochen.</li>
+</ul>
+
+<h3 class="sub-h">Bento und Hygiene</h3>
+<table><tr><th>Mittagsgericht</th><th class="num">Tag</th><th class="num">Transport</th><th>Wie</th></tr>
+<tr><td>Burrito-Bowl</td><td class="num">Di</td><td class="num">kalt</td><td>Isoliertasche mit 2 Kühlakkus, Sauce getrennt, im Büro wahlweise 90 Sek Mikrowelle</td></tr>
+<tr><td>Tikka-Masala-Bowl</td><td class="num">Mi</td><td class="num">heiß</td><td>Thermobehälter, vorgewärmt und kochend heiß befüllt, Parutheno kalt getrennt</td></tr>
+<tr><td>Linsen-Dal</td><td class="num">Do</td><td class="num">heiß</td><td>Thermobehälter, vorgewärmt und kochend heiß befüllt, Parutheno kalt getrennt</td></tr>
+</table>
+<p class="note">Die anderen Mittage (Mo, Fr, Sa, So) isst du zu Hause aus dem Kühlschrank.</p>
+<ul class="plain">
+<li>Mittag wird am Vorabend als Einzelportion gekocht und am nächsten Tag gegessen, nie später.</li>
+<li>Nach dem Kochen sofort in die Box füllen, 30 bis 45 Min offen abkühlen lassen und spätestens nach einer Stunde in den Kühlschrank stellen. Vor allem Reis nicht lange bei Zimmertemperatur stehen lassen.</li>
+<li>Heiße Gerichte morgens im Topf oder in der Mikrowelle kochend heiß erhitzen und sofort in den vorgewärmten Thermobehälter füllen (vorher 5 Min mit kochendem Wasser füllen). So bleiben sie bis mittags über 60 Grad.</li>
+<li>Nicht morgens nur lauwarm machen und einpacken. Warm eingepackt steht das Essen mehrere Stunden in einem Temperaturbereich, in dem sich Keime schnell vermehren.</li>
+<li>Hähnchen und Lachs sind immer komplett durchgegart. Der Lachs in der Poke-Bowl ist gegart und nicht roh.</li>
+<li>Saucen und Dressings getrennt einpacken und erst im Büro oder beim Essen darübergeben.</li>
+<li>Angebrochene Packungen von Tofu, Parutheno, Thunfisch und Proteinmilch innerhalb weniger Tage aufbrauchen.</li>
+</ul>
+
+<h3 class="sub-h">Halal-Prüfliste für Etiketten</h3>
+<table><tr><th>Produkt</th><th>Worauf du achtest</th></tr>
+<tr><td>Hühnerbrühe-Pulver</td><td>kein Schweinefett oder Schweinefleischextrakt, kein Alkohol</td></tr>
+<tr><td>Soy Protein Bar (Snack-Rotation)</td><td>Herkunft von Emulgator und Aroma. Nur den SAVAS Soy Protein Bar nehmen, die anderen SAVAS Bars enthalten zugesetztes Eisen</td></tr>
+<tr><td>Frische Ramen-Nudeln</td><td>oft mit Alkohol als Konservierung (アルコール), Etikett prüfen</td></tr>
+<tr><td>Käsestick</td><td>tierisches Lab, Emulgatoren, Zutatenliste prüfen</td></tr>
+<tr><td>Cookie und Mayo</td><td>Schmalz, Gelatine oder Alkohol (z. B. Rum) ausschließen</td></tr>
+<tr><td>Sojasauce</td><td>enthält herstellungsbedingt etwas Alkohol, alkoholfreie Sorten gibt es</td></tr>
+</table>
+
+<h3 class="sub-h">Supplemente · täglich</h3>
+<table>
+<tr><th>Supplement</th><th class="num">Dosis</th><th>Zeitpunkt</th></tr>
+<tr><td>Vitamin D3</td><td class="num">5.000 IU</td><td>Morgens mit Mahlzeit</td></tr>
+<tr><td>Vitamin K2 MK-7</td><td class="num">100 mcg</td><td>Morgens, mit D3</td></tr>
+<tr><td>Magnesium-Bisglycinat</td><td class="num">200 mg</td><td>Abends vor dem Schlafen</td></tr>
+<tr><td>Zink-Bisglycinat</td><td class="num">15 bis 25 mg</td><td>Mittags, getrennt von Magnesium/Calcium</td></tr>
+<tr><td>Kreatin-Monohydrat</td><td class="num">5g</td><td>Flexibel, täglich</td></tr>
+<tr><td>Whey Protein</td><td class="num">30g täglich</td><td>Feste tägliche Portion als Snack</td></tr>
+</table>
+<div class="callout"><b>Kein Eisen:</b> dauerhaft ausgeschlossen (Thalassämie-Konstellation, kein echter Mangel), unabhängig von Ferritin/Serum-Eisen.</div>
+<div class="callout ok"><b>Zink-Dosis:</b> Nicht &gt;40mg ohne Kupfer-Ausgleich. Nach 2 bis 3 Monaten erneut prüfen.</div>
+<div class="callout"><b>Nächstes Labor:</b> Freies T3/T4 mitbestimmen, nicht nur TSH.</div>
+
+<h3 class="sub-h">So ist gerechnet</h3>
+<p class="note">Nährwerte sind Tabellenwerte (grobe Näherung aus den Rohgewichten, Etikettenwerte deiner Packungen können um 5 bis 10 % abweichen, das Etikett hat Vorrang). Parutheno plain ohne Zucker (280-g-Packung) nach Herstellerangabe von Morinaga (99 kcal, 10,2g Protein, 4,3g Fett und 4,9g Kohlenhydrate pro 100g). Bei der Hähnchenbrust gelten die Werte für Brust ohne Haut (ca. 22,5g Protein pro 100g). Mit Haut hat sie deutlich mehr Kalorien und weniger Protein. Mayo ist als kalorienreduzierte Sorte gerechnet, Reis zu 25 % durch Gerste ersetzt. Preise sind Schätzungen. Die Tagessummen lagen im Prüflauf bei 2.267 bis 2.304 kcal. Bei den Snacks stammen die Werte vom SAVAS Soy Protein Bar von Meiji und von der Proteinmilch laut Herstellerseite, alles andere sind Tabellenwerte.</p>
+
+</div>
+    </div>
+
+
+    <!-- ================= GYM ================= -->
+    <div class="panel" id="gym">
+      <h2 class="section-title">Gym-Trainingsplan v6.1</h2>
+      <p class="lead">4er-Split, Anytime Fitness Ikuta. RPE-Cap 9/10, Pause zwischen Grundübungen 90–120s. Deload alle 5 Wochen.</p>
+
+      <div class="callout"><b>Dauerhaft tabu:</b> Barbell Overhead Press · Nackendrücken · Konventionelles Kreuzheben vom Boden · Crunches/Sit-ups</div>
+
+      <button class="toggle-all" data-scope="gym">Alle aufklappen</button>
+
+      <details class="dblock" open>
+        <summary><span>MONTAG · PUSH</span><span class="tag">obere Brust + laterale Schulter</span></summary>
+        <div class="dbody">
+          <table>
+            <tr><th>Übung</th><th>Winkel / Griff / Höhe</th><th class="num">Sätze × Wdh.</th><th class="num">RPE</th><th class="num">Pause</th></tr>
+            <tr><td>Incline DB/Barbell Bench Press</td><td>Bank <b>positiv 30–45°</b> · Griff: Obergriff (LH) bzw. neutraler Obergriff, Handflächen nach vorn (KH)</td><td class="num">4 × 6–8</td><td class="num">8–9</td><td class="num">120s</td></tr>
+            <tr><td>Flat DB Press</td><td>Bank <b>neutral/flach (0°)</b> · Griff Obergriff, Handflächen Richtung Füße</td><td class="num">3 × 8–10</td><td class="num">8</td><td class="num">90s</td></tr>
+            <tr><td>DB/Cable Lateral Raise</td><td>Kabel <b>tief</b> (Umlenkrolle unten) · Griff neutral, Daumen minimal nach unten (nicht aktiv einwärts drehen)</td><td class="num">5 × 12–15</td><td class="num">8–9</td><td class="num">60s</td></tr>
+            <tr><td>Cable Incline Fly</td><td>Bank <b>positiv 30°</b> · Kabel <b>tief→hoch</b> (von unten schräg zur Bank), Griff neutral</td><td class="num">4 × 12–15</td><td class="num">8</td><td class="num">60s</td></tr>
+            <tr><td>Single-Arm Cable Press <i>(Split-Stand)</i></td><td>Kabel <b>Brusthöhe</b> (gleiche Höhe wie Zielmuskel) · Griff neutral</td><td class="num">3 × 8–10/Seite</td><td class="num">7–8</td><td class="num">90s</td></tr>
+            <tr><td>Trizeps-Pushdown</td><td>Kabel <b>hoch</b> (Umlenkrolle oben) · Griff Obergriff (Stange) oder Neutralgriff (Seil)</td><td class="num">4 × 10–12</td><td class="num">8</td><td class="num">60s</td></tr>
+          </table>
+          <p class="note">Single-Arm Cable Press: Ausfallschritt-Stand, gegenüberliegendes Bein vorn. Presst diagonal nach vorn, Rumpf bewusst gegen die Rotation stabilisieren — ersetzt den Landmine Press 1:1 ohne zusätzliches Equipment, gleicher unilateraler Anti-Rotations-Reiz.</p>
+        </div>
+      </details>
+
+      <details class="dblock">
+        <summary><span>DIENSTAG · PULL</span><span class="tag">Rücken + Bizeps + hintere Schulter</span></summary>
+        <div class="dbody">
+          <table>
+            <tr><th>Übung</th><th>Winkel / Griff / Höhe</th><th class="num">Sätze × Wdh.</th><th class="num">RPE</th><th class="num">Pause</th></tr>
+            <tr><td>Klimmzüge <i>— sonst: Lat Pulldown</i></td><td>Griff <b>Obergriff, breit</b> (breiter als Schulterbreite)</td><td class="num">4 × 6–10</td><td class="num">8–9</td><td class="num">120s</td></tr>
+            <tr><td>Chest-Supported Row</td><td>Bank <b>positiv ~30–45°</b> (Brust aufliegend) · Griff neutral (KH) oder Obergriff (LH)</td><td class="num">4 × 8–10</td><td class="num">8</td><td class="num">90s</td></tr>
+            <tr><td>Cable Face Pull</td><td>Kabel <b>hoch</b> (Umlenkrolle auf Augen-/Stirnhöhe) · Seil, Griff neutral, nach außen zu den Ohren ziehen</td><td class="num">4 × 15</td><td class="num">7–8</td><td class="num">60s</td></tr>
+            <tr><td>Single-Arm DB Row</td><td>Bank <b>neutral</b> (Knie + Hand aufgestützt, Rücken parallel zum Boden) · Griff neutral</td><td class="num">3 × 10/Seite</td><td class="num">8</td><td class="num">90s</td></tr>
+            <tr><td>Rear Delt Fly</td><td>Vorgebeugt <b>negativ</b> (Oberkörper ~45° nach vorn geneigt, sitzend oder stehend) · Griff neutral</td><td class="num">3 × 15</td><td class="num">8</td><td class="num">60s</td></tr>
+            <tr><td>DB Bizeps Curl</td><td>Griff <b>Untergriff</b> (Supination)</td><td class="num">4 × 10–12</td><td class="num">8</td><td class="num">60s</td></tr>
+            <tr><td>Cable Chest Fly <i>(Frequenz-Touch Brust)</i></td><td>Kabel <b>hoch→tief</b> (Umlenkrolle oben, diagonal nach unten-innen ziehen) · Griff neutral</td><td class="num">3 × 12–15</td><td class="num">7</td><td class="num">60s</td></tr>
+            <tr><td>DB/Cable Shrugs</td><td>Griff neutral (KH) bzw. Obergriff (Kabel) · Kabel <b>gleiche Höhe</b> (am Körper entlang, nicht nach vorn/hinten ziehen)</td><td class="num">4 × 12–15</td><td class="num">8</td><td class="num">60s</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <details class="dblock">
+        <summary><span>FREITAG · LEGS + CORE</span><span class="tag">Beine, Rumpfstabilität</span></summary>
+        <div class="dbody">
+          <table>
+            <tr><th>Übung</th><th>Winkel / Griff / Höhe</th><th class="num">Sätze × Wdh.</th><th class="num">RPE</th><th class="num">Pause</th></tr>
+            <tr><td>Leg Press</td><td>Füße <b>schulterbreit, mittig</b> auf der Platte, Winkel ~45°</td><td class="num">4 × 8–10</td><td class="num">8–9</td><td class="num">120s</td></tr>
+            <tr><td>Leg Extension</td><td>Sitzend, Rückenlehne neutral</td><td class="num">3 × 12–15</td><td class="num">7–8</td><td class="num">60s</td></tr>
+            <tr><td>Romanian Deadlift <i>(von Hüfte)</i></td><td>Griff <b>Obergriff</b> (beidhändig, keine Mixed-Grip nötig bei diesem Gewicht)</td><td class="num">3 × 8–10</td><td class="num">8</td><td class="num">120s</td></tr>
+            <tr><td>Barbell Hip Thrust</td><td>Rücken/Schulterblätter an Bank <b>(Bankkante auf Schulterblatthöhe)</b>, Stange mit Polster auf Hüfte</td><td class="num">3 × 8–12</td><td class="num">8</td><td class="num">120s</td></tr>
+            <tr><td>Bulgarian Split Squat</td><td>Hinteres Bein <b>erhöht</b> (Bank), Knie vorderes Bein Richtung Fußspitze</td><td class="num">3 × 10/Seite</td><td class="num">8</td><td class="num">90s</td></tr>
+            <tr><td>Leg Curl</td><td>Liegend oder sitzend (je nach Gerät)</td><td class="num">4 × 12</td><td class="num">8</td><td class="num">60s</td></tr>
+            <tr><td>Pallof Press</td><td>Kabel <b>Brusthöhe</b>, seitlich zum Kabelturm stehend</td><td class="num">3 × 12/Seite</td><td class="num">7</td><td class="num">60s</td></tr>
+            <tr><td>Bird Dog <i>(neu — Ergänzung zu Pallof Press)</i></td><td>Neutrale Wirbelsäule, Arm/Bein <b>gleiche Höhe</b> wie Rumpf (nicht überstrecken)</td><td class="num">3 × 8–10/Seite</td><td class="num">6–7</td><td class="num">45s</td></tr>
+            <tr><td>Hanging Knee Raise</td><td>Griff <b>Obergriff</b> an der Klimmzugstange, Becken leicht nach hinten kippen</td><td class="num">3 × 10–12</td><td class="num">7–8</td><td class="num">60s</td></tr>
+            <tr><td>Front Plank</td><td>Ellbogen unter Schultern, Becken <b>neutral</b> (nicht hochschieben)</td><td class="num">3 × 30–45s</td><td class="num">7</td><td class="num">45s</td></tr>
+            <tr><td>Standing/Seated Calf Raise</td><td>Fußstellung neutral, Zehen leicht erhöht auf Kante</td><td class="num">4 × 15–20</td><td class="num">8</td><td class="num">45s</td></tr>
+          </table>
+          <p class="note">Hip Thrust: höchste Glutaeus-maximus-Aktivierung aller Übungen (Contreras 2015, 86.8% mittlere MVIC vs. 45.4% beim Squat) — direktester Hebel gegen die anteriore Beckenkippung, sicher trotz ausgeschlossenem Bodenkreuzheben. Bird Dog: ergänzt Pallof Press um Anti-Extension-Kontrolle (Rumpf stabil halten, während sich Arm/Bein bewegen) — Teil von McGills "Big Three" für rückenschonende Rumpfstabilität, unilateral daher auch für die milde Skoliose sinnvoll.</p>
+        </div>
+      </details>
+
+      <details class="dblock">
+        <summary><span>SAMSTAG · CORRECTIVE + WEAK POINTS</span><span class="tag">Haltung, Schwachstellen</span></summary>
+        <div class="dbody">
+          <table>
+            <tr><th>Übung</th><th>Winkel / Griff / Höhe</th><th class="num">Sätze × Wdh.</th><th class="num">RPE</th><th class="num">Pause</th></tr>
+            <tr><td>Serratus-Punch am Kabel <i>(2 Sätze links, 1 Satz rechts — Winging-Bias)</i></td><td>Kabel <b>Brusthöhe</b>, leicht diagonal nach vorn-oben stoßen</td><td class="num">3 × 12/Seite</td><td class="num">7</td><td class="num">60s</td></tr>
+            <tr><td>Seated Cable Row (breit)</td><td>Kabel <b>tief</b> (Umlenkrolle unten) · Griff Obergriff, breite Stange</td><td class="num">3 × 12</td><td class="num">7–8</td><td class="num">90s</td></tr>
+            <tr><td>Straight-Arm Pulldown <i>(Rückenbreite)</i></td><td>Kabel <b>hoch</b> (Umlenkrolle oben) · Griff Obergriff, Arme fast gestreckt zur Hüfte ziehen</td><td class="num">3 × 12–15</td><td class="num">7–8</td><td class="num">60s</td></tr>
+            <tr><td>Prone Y-Raise</td><td>Bank <b>positiv 30–45°</b> (Bauchlage) · Arme in Y-Form, Daumen nach oben</td><td class="num">3 × 12</td><td class="num">7</td><td class="num">60s</td></tr>
+            <tr><td>Side-lying DB External Rotation <i>(neu)</i></td><td>Seitlage · Ellbogen <b>90°, am Körper fixiert</b> · Griff neutral, Unterarm nach oben rotieren</td><td class="num">3 × 12–15/Seite</td><td class="num">6–7</td><td class="num">45s</td></tr>
+            <tr><td>Cable External Rotation</td><td>Kabel <b>gleiche Höhe wie Ellbogen</b> (Taillenhöhe) · Ellbogen 90° am Körper fixiert</td><td class="num">2 × 15/Seite</td><td class="num">6–7</td><td class="num">45s</td></tr>
+            <tr><td>Cable Lateral Raise</td><td>Kabel <b>tief</b> (Umlenkrolle unten) · Griff neutral</td><td class="num">3 × 15</td><td class="num">7–8</td><td class="num">60s</td></tr>
+            <tr><td>Incline DB Curl</td><td>Bank <b>negativ ~45–60°</b> (zurückgelehnt) · Griff Untergriff (Supination)</td><td class="num">4 × 10–12</td><td class="num">8</td><td class="num">60s</td></tr>
+            <tr><td>Overhead Trizeps-Extension</td><td>Kabel/Seil <b>hinter dem Kopf</b> · Griff neutral (Seil) oder Obergriff (EZ-Stange), Ellbogen fixiert Richtung Decke</td><td class="num">4 × 10–12</td><td class="num">8</td><td class="num">60s</td></tr>
+          </table>
+          <p class="note">Side-lying External Rotation: beste isolierte Infraspinatus/Teres-minor-Aktivierung (62–67% MVIC, Reinold 2004) — ergänzt die Cable-Variante, die eher funktionell/unter Last arbeitet. Serratus-Punch bewusst mit mehr Volumen links, da das dokumentierte Scapula-Winging linksseitig ist.</p>
+        </div>
+      </details>
+
+      <div class="callout ok"><b>Progression:</b> Woche 1–4 Gewicht/Wdh. steigern innerhalb RPE-Grenze, Woche 5 = Deload (−40% Volumen, RPE ≤6).</div>
+    </div>
+
+    <!-- ================= BOXING ================= -->
+    <div class="panel" id="boxing">
+      <h2 class="section-title">Boxen + Cardio</h2>
+      <p class="lead">Boxen 1× pro Woche bei REALDEAL Musashi-Kosugi, plus optionaler Zone-2-Cardio-Slot für die aerobe Basis (Ziel 3). Kontrollierte Intervalle statt freiem Sparring solange RPE-Cap 9 gilt.</p>
+
+      <button class="toggle-all" data-scope="boxing">Alle aufklappen</button>
+
+      <details class="dblock" open>
+        <summary><span>SESSION-AUFBAU</span><span class="tag">~75–90 Min gesamt</span></summary>
+        <div class="dbody">
+          <table>
+            <tr><th>Phase</th><th class="num">Dauer</th><th>Inhalt</th></tr>
+            <tr><td>Warm-up</td><td class="num">10 Min</td><td>Seilspringen locker, Schattenboxen, Mobilisation</td></tr>
+            <tr><td>Technik</td><td class="num">15–20 Min</td><td>Pratzenarbeit: Grundschläge, Kombinationen, Fußarbeit</td></tr>
+            <tr><td>Kontrollierte Intervalle</td><td class="num">15–20 Min</td><td>3–5 Runden à 2–3 Min, reduziertes Tempo, RPE ≤9</td></tr>
+            <tr><td>Sparring (optional)</td><td class="num">10–15 Min</td><td>Nur leicht/technisch, kein Vollkontakt</td></tr>
+            <tr><td>Cool-down</td><td class="num">10 Min</td><td>Auslaufen, Dehnung, Puls beobachten (Apple Watch)</td></tr>
+          </table>
+        </div>
+      </details>
+
+      <div class="callout"><b>Sicherheitsnetz:</b> RPE-Cap 9/10 auch beim Boxen. Ruhepuls mehrere Tage erhöht → Intensität reduzieren. Volles Sparring/HIIT erst nach hämatologischer Freigabe.</div>
+      <div class="callout ok"><b>Priorität bei Engpass:</b> Bei knapper Regeneration wird zuerst Boxen reduziert — nicht der Gym-Plan.</div>
+
+      <details class="dblock">
+        <summary><span>DONNERSTAG · OPTIONAL ZONE-2 CARDIO</span><span class="tag">Ziel 3: Aerobe Basis</span></summary>
+        <div class="dbody">
+          <p class="note">Boxen-Intervalle allein decken deine aerobe Basis nicht vollständig ab (nur 1×/Woche, eher anaerob-lastig durch die Runden-Struktur). Dieser Slot schließt die Lücke — komplett optional, aber empfohlen, sobald Schlaf/HRV stabil sind. Zwei gleichwertige Varianten, wähl nach Lust:</p>
+          <table>
+            <tr><th>Variante</th><th class="num">Dauer</th><th>Details</th></tr>
+            <tr><td>A — Zone-2 Cardio <i>(Gehen, Rad, Schwimmen, Ruderergometer)</i></td><td class="num">20–30 Min</td><td>Konstantes, lockeres Tempo — du solltest dich noch problemlos unterhalten können. Ziel: ~60–70% der max. Herzfrequenz (Apple Watch)</td></tr>
+            <tr><td>B — Kettlebell-Komplex <i>(Swings + Goblet Squat + Clean)</i></td><td class="num">15–20 Min</td><td>5 Runden: 10× Swing, 8× Goblet Squat, 6×/Seite Clean, 60–90s Pause zwischen Runden. Trainiert Hüftexplosivität (Ziel 2: Selbstverteidigung) UND Herz-Kreislauf gleichzeitig — RPE 6–7, nicht maximal</td></tr>
+          </table>
+          <p class="note">Kein RPE-Cap-Konflikt: beide Varianten bleiben weit unter RPE 9. Bei knapper Zeit/Erholung: zuerst diesen Slot streichen, dann Boxen, dann Gym (Prioritätsreihenfolge von unten nach oben). Kettlebell-Variante wählen, wenn Selbstverteidigung/Explosivität gerade mehr im Fokus steht — Zone-2, wenn reine Erholung/Grundlagenausdauer wichtiger ist.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="footnote">REV. 9 · 05.11.2026</div>
+  </main>
+</div>
+
+<script>
+  const navBtns = document.querySelectorAll('.navbtn');
+  const panels = document.querySelectorAll('.panel');
+
+  function activate(tab){
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    panels.forEach(p => p.classList.toggle('active', p.id === tab));
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+  navBtns.forEach(btn => btn.addEventListener('click', () => activate(btn.dataset.tab)));
+  document.querySelectorAll('.dash-card').forEach(card => {
+    card.addEventListener('click', () => activate(card.dataset.goto));
+  });
+
+  document.querySelectorAll('.toggle-all').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const scope = document.getElementById(btn.dataset.scope);
+      const blocks = scope.querySelectorAll('details.dblock');
+      const anyClosed = Array.from(blocks).some(b => !b.open);
+      blocks.forEach(b => b.open = anyClosed);
+      btn.textContent = anyClosed ? 'Alle zuklappen' : 'Alle aufklappen';
+    });
+  });
+
+  // ---------- Unterreiter, Filter, Heute-Box ----------
+  const PLAN = {"Mo": {"name": "Montag", "train": "Gym: Push", "f": ["FA", "Joghurt-Bowl"], "l": ["L4", "Thunfisch-Protein-Bowl"], "d": ["N1", "Bohnen-Eintopf"], "s": null, "transport": null, "kcal": 2299, "p": 161.5, "veg": 560, "cookD": ["Bohnen-Eintopf", 20], "cookL": ["Burrito-Bowl", 25, "Dienstag"]}, "Di": {"name": "Dienstag", "train": "Gym: Pull", "f": ["FB", "Toast, Ei, Tofu"], "l": ["L1", "Burrito-Bowl"], "d": ["D5", "Knuspriger Tofu"], "s": ["S4", "Chia-Pudding mit Beeren"], "transport": "kalt", "kcal": 2304, "p": 175.6, "veg": 420, "cookD": ["Knuspriger Tofu", 25], "cookL": ["Tikka-Masala-Bowl", 25, "Mittwoch"]}, "Mi": {"name": "Mittwoch", "train": "Boxen", "f": ["FB", "Toast, Ei, Tofu"], "l": ["L3", "Tikka-Masala-Bowl"], "d": ["D3", "Thunfisch-Wrap"], "s": ["S2", "Protein-Pfannkuchen"], "transport": "heiß", "kcal": 2299, "p": 179.4, "veg": 370, "cookD": ["Thunfisch-Wrap", 5], "cookL": ["Linsen-Dal", 25, "Donnerstag"]}, "Do": {"name": "Donnerstag", "train": "Cardio (optional)", "f": ["FB", "Toast, Ei, Tofu"], "l": ["L5", "Linsen-Dal"], "d": ["D1", "Creamy Garlic Chicken"], "s": ["S1", "Thunfisch-Onigiri"], "transport": "heiß", "kcal": 2301, "p": 182.9, "veg": 440, "cookD": ["Creamy Garlic Chicken", 20], "cookL": ["Poke-Bowl", 20, "Freitag"]}, "Fr": {"name": "Freitag", "train": "Gym: Legs + Core", "f": ["FA", "Joghurt-Bowl"], "l": ["L2", "Poke-Bowl"], "d": ["L3", "Tikka-Masala-Bowl"], "s": null, "transport": null, "kcal": 2304, "p": 174.3, "veg": 410, "cookD": ["Tikka-Masala-Bowl", 25], "cookL": ["Bohnen-Eintopf", 20, "Samstag"]}, "Sa": {"name": "Samstag", "train": "Gym: Corrective", "f": ["FA", "Joghurt-Bowl"], "l": ["N1", "Bohnen-Eintopf"], "d": ["D2", "Chicken Ramen"], "s": null, "transport": null, "kcal": 2267, "p": 175.1, "veg": 530, "cookD": ["Chicken Ramen", 15], "cookL": ["Burrito-Bowl", 25, "Sonntag"]}, "So": {"name": "Sonntag", "train": "Ruhetag", "f": ["FA", "Joghurt-Bowl"], "l": ["L1", "Burrito-Bowl"], "d": ["D1", "Creamy Garlic Chicken"], "s": null, "transport": "kalt", "kcal": 2268, "p": 198.1, "veg": 480, "cookD": ["Creamy Garlic Chicken", 20], "cookL": ["Thunfisch-Protein-Bowl", 20, "Montag"]}};
+  const DAYS = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const todayKey = DAYS[new Date().getDay()];
+
+  function showSub(id){
+    const group = document.getElementById(id).parentElement;
+    group.querySelectorAll(':scope > .subpanel').forEach(p => p.classList.toggle('active', p.id === id));
+    group.querySelectorAll('.subnav .pill').forEach(b => b.classList.toggle('active', b.dataset.subtab === id));
+  }
+  document.querySelectorAll('.subnav .pill').forEach(b => b.addEventListener('click', () => { showSub(b.dataset.subtab); }));
+
+  function setFilter(f){
+    document.querySelectorAll('.filters .pill').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+    document.querySelectorAll('#food-recipes .rgroup').forEach(g => { g.style.display = (f === 'all' || g.dataset.cat === f) ? '' : 'none'; });
+  }
+  document.querySelectorAll('.filters .pill').forEach(b => b.addEventListener('click', () => setFilter(b.dataset.filter)));
+
+  const rtoggle = document.querySelector('.rtoggle');
+  if (rtoggle) rtoggle.addEventListener('click', () => {
+    const cards = Array.from(document.querySelectorAll('#food-recipes details.rcard')).filter(c => c.closest('.rgroup').style.display !== 'none');
+    const anyClosed = cards.some(c => !c.open);
+    cards.forEach(c => c.open = anyClosed);
+    rtoggle.textContent = anyClosed ? 'Alle zuklappen' : 'Alle aufklappen';
+  });
+
+  function openRecipe(code){
+    activate('food'); showSub('food-recipes'); setFilter('all');
+    const el = document.getElementById('r-' + code);
+    if (el){ el.open = true; el.scrollIntoView({behavior:'smooth', block:'start'}); }
+  }
+  document.querySelectorAll('button.lnk').forEach(b => b.addEventListener('click', () => openRecipe(b.dataset.recipe)));
+
+  function esc(t){ return String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+  function row(k, letter, item){
+    return '<div class="mrow"><span class="mk ' + k + '">' + letter + '</span><button class="lnk" data-recipe="' + item[0] + '">' + esc(item[1]) + '</button></div>';
+  }
+  function renderToday(){
+    const p = PLAN[todayKey];
+    let html;
+    if (!p){ html = ''; }
+    else {
+      html = '<div class="th"><span class="tday">Heute, ' + p.name + '</span><span class="mchip">' + esc(p.train) + '</span></div>';
+      html += row('F','F',p.f) + row('L','M',p.l) + row('D','A',p.d);
+      html += p.s ? row('S','S',p.s) : '<div class="mrow muted"><span class="mk S">S</span><span>nur Whey</span></div>';
+      const tr = p.transport ? (p.transport === 'kalt' ? 'Mittag kalt mitnehmen (Kühlakkus).' : 'Mittag heiß im vorgewärmten Thermobehälter mitnehmen.') : '';
+      html += '<div class="tcook"><b>Heute Abend kochen:</b> ' + esc(p.cookD[0]) + ' (ca. ' + p.cookD[1] + ' Min) und das Mittagessen für morgen, ' + esc(p.cookL[0]) + ' (ca. ' + p.cookL[1] + ' Min). ' + tr + '<br>' + p.kcal + ' kcal, ' + String(p.p).replace('.', ',') + 'g Protein, ' + p.veg + 'g Gemüse heute.</div>';
+    }
+    document.querySelectorAll('[data-today]').forEach(el => { el.innerHTML = html; });
+    document.querySelectorAll('.daycard, tr[data-day]').forEach(el => { if (el.dataset.day === todayKey) el.classList.add('today'); });
+    document.querySelectorAll('[data-today] button.lnk').forEach(b => b.addEventListener('click', () => openRecipe(b.dataset.recipe)));
+  }
+  renderToday();
+</script>
+</body>
+</html>
